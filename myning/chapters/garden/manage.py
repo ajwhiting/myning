@@ -172,8 +172,9 @@ def water_plant(row: int, column: int):
 
 
 @confirm(
-    lambda row, column: "Are you sure you want to remove this "
-    f"{garden.get_plant(row, column).icon} plant?",  # type:ignore
+    lambda row, column: (
+        f"Are you sure you want to remove this {garden.get_plant(row, column).icon} plant?"
+    ),  # type:ignore
     manage_garden,
 )
 def remove_plant(row: int, column: int):

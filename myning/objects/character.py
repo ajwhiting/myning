@@ -67,7 +67,7 @@ class Character(Object):
         self.experience = 0
         self.species: Species = species
         self.health = self.max_health
-        self.id = f"{self.name} - {get_random_int(10 ** 13)}"
+        self.id = f"{self.name} - {get_random_int(10**13)}"
 
     @property
     def health_mod(self):
@@ -170,7 +170,7 @@ class Character(Object):
             FileManager.delete(entity)
 
             # create new file for allies
-            entity.id = f"{entity.name} - {get_random_int(10 ** 13)}"
+            entity.id = f"{entity.name} - {get_random_int(10**13)}"
             FileManager.save(entity)
 
         entity.is_ghost = dict.get("is_ghost") or False

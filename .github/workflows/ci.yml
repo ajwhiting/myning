@@ -22,10 +22,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt -r requirements-dev.txt
-    - name: Lint with isort & black
+    - name: Lint with ruff
       run: |
-        isort . --check --diff
-        black . --check
+        ruff check .
+        ruff format --check .
     - name: Test with pytest
       run: |
         pytest

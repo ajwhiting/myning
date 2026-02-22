@@ -63,14 +63,7 @@ class Player(Character, metaclass=Singleton):
             sum(mine.win_value * math.pow(mine.cost, 1 / 3) for mine in self.mines_completed)
         )
 
-        return (
-            army_value
-            + exp_value
-            + upgrades_value
-            + unlocked_mines
-            + self.gold
-            + beaten_mines
-        )
+        return army_value + exp_value + upgrades_value + unlocked_mines + self.gold + beaten_mines
 
     def has_upgrade(self, upgrade_id):
         return upgrade_id in [upgrade.id for upgrade in self.upgrades]

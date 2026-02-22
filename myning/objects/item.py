@@ -2,7 +2,6 @@ from enum import Enum
 
 from rich.text import Text
 
-from myning.chapters import OptionLabel
 from myning.objects.object import Object
 from myning.utilities.rand import get_random_int
 from myning.utilities.ui import Colors, Icons
@@ -131,12 +130,12 @@ class Item(Object):
 
     @property
     def tutorial_new_str(self):
-        return f"New {self.type} added: [{self.color}]{self.name}[/]"
+        return f"New {self.type.value} added: [{self.color}]{self.name}[/]"
 
     @property
     def battle_new_str(self):
         return (
-            f"New {self.type} added: "
+            f"New {self.type.value} added: "
             f"{self.icon} [{self.color}]{self.name}[/] "
             f"([{self.color}]{self.main_affect}[/])"
         )

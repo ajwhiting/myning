@@ -4,16 +4,21 @@ from unittest.mock import patch
 
 import pytest
 
-from myning.config import load_config
 from myning.objects.game import Game, GameState
+from myning.objects.garden import Garden
+from myning.objects.graveyard import Graveyard
 from myning.objects.inventory import Inventory
+from myning.objects.macguffin import Macguffin
 from myning.objects.player import Player
+from myning.objects.research_facility import ResearchFacility
+from myning.objects.settings import Settings
+from myning.objects.stats import Stats
 from myning.objects.trip import Trip
 
 # pylint: disable=redefined-outer-name
 
-# Load game data and initialize singletons before app tests
-load_config()
+# Initialize ALL singletons before app/chapter modules are imported, since they
+# reference singletons at module level (e.g. ``player = Player()``).
 Player.initialize("MockPlayer")
 player = Player()
 player.reset()
@@ -22,11 +27,18 @@ Game.initialize()
 game = Game()
 game._state = GameState.READY  # pylint: disable=protected-access
 
+Garden.initialize()
+Graveyard.initialize()
 Inventory.initialize()
+Macguffin.initialize()
+ResearchFacility.initialize()
+Settings.initialize()
+Stats.initialize()
+Trip.initialize()
+
 inventory = Inventory()
 inventory._items = {}  # pylint: disable=protected-access
 
-Trip.initialize()
 trip = Trip()
 trip.clear()
 

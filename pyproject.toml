@@ -1,28 +1,23 @@
-[tool.black]
+[tool.ruff]
 line-length = 100
-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.githooks
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | yoyo
-  )/
-  | setup.py
-)
-'''
 
-[tool.isort]
-profile = "black"
-line_length = 100
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "W",   # pycodestyle warnings
+]
+ignore = [
+    "E501",  # line too long — handled by formatter where possible; many game strings are intentionally long
+]
+
+[tool.ruff.lint.per-file-ignores]
+"myning/api/__init__.py" = ["E402", "F401"]  # intentional late import with side effects
+"tests/conftest.py" = ["E402"]  # singletons must init before TUI imports
+
+[tool.ruff.lint.isort]
+known-first-party = ["myning"]
 
 [tool.pytest.ini_options]
 addopts = "-svx --cov=. --cov-report=term --cov-report=html"

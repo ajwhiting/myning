@@ -1,9 +1,9 @@
-black
-isort
 pdbpp
 pip-tools
 pytest
 pytest-asyncio
 pytest-cov
+ruff
 textual-dev
 textual==0.32.0 # Lock to fix mine screen border bug
+ty

@@ -44,26 +44,19 @@ For TUI debugging, `make dev` launches a Textual console alongside the game.
 ### Linting (must pass before committing)
 
 ```bash
-make lint    # runs both isort and black in check mode
-```
-
-Individual tools:
-```bash
-isort . --check --diff   # import ordering
-black . --check          # code formatting
+make lint    # runs ruff check + ruff format --check
 ```
 
 To auto-fix:
 ```bash
-isort .
-black .
+make format  # runs ruff check --fix + ruff format
 ```
 
 ### Code style rules
 
-- **Line length:** 100 characters (Black + isort both configured to this)
-- **Import ordering:** isort with `profile = "black"`
-- **Formatter:** Black (no manual style decisions)
+- **Line length:** 100 characters (configured in `pyproject.toml`)
+- **Linter + formatter:** [Ruff](https://docs.astral.sh/ruff/) (replaces Black + isort)
+- **Pre-commit:** `.pre-commit-config.yaml` runs ruff on staged files
 
 ## Testing
 
@@ -90,13 +83,13 @@ Key fixtures available in all tests:
 - `mock_save` *(autouse)* — patches `FileManager.save` and `FileManager.multi_save` so tests never write to disk
 - `reset_objects` *(autouse)* — resets player, inventory, and trip state before each test
 
-**Important:** Always initialize singleton objects (Player, Game, Inventory, Trip) before importing TUI modules in tests. See `conftest.py` for the established pattern.
+**Important:** Always initialize **all** singleton objects before importing TUI modules in tests (TUI and chapter modules reference singletons at module level). See `conftest.py` for the established pattern.
 
 ## CI/CD
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on push/PR to `main`:
-1. `isort . --check --diff`
-2. `black . --check`
+1. `ruff check .`
+2. `ruff format --check .`
 3. `pytest`
 
 All three must pass for a PR to merge.

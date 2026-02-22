@@ -40,12 +40,10 @@ class Inventory(Object, metaclass=Singleton):
                 self._items[item.type].remove(item)
 
     @overload
-    def get_slot(self, slot: Literal[ItemType.PLANT]) -> list[Plant]:
-        ...
+    def get_slot(self, slot: Literal[ItemType.PLANT]) -> list[Plant]: ...
 
     @overload
-    def get_slot(self, slot: ItemType) -> list[Item]:
-        ...
+    def get_slot(self, slot: ItemType) -> list[Item]: ...
 
     def get_slot(self, slot) -> list[Item] | list[Plant]:
         return self._items.get(slot, [])

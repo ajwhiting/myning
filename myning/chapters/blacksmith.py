@@ -105,7 +105,7 @@ class Blacksmith(BaseStore):
             message="Are you sure you want to upgrade your blacksmith "
             f"for {Formatter.gold(self.upgrade_cost)}?",
             options=[
-                Option(f"Upgrade to level {self.level+1}", self.upgrade),
+                Option(f"Upgrade to level {self.level + 1}", self.upgrade),
                 Option("Maybe Later", self.enter),
             ],
         )

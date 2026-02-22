@@ -14,6 +14,8 @@ garden = Garden()
 
 
 class GardenTable(OptionTable):  # pylint: disable=too-many-ancestors
+    extra_hotkey_aliases = {"h": "left", "l": "right"}
+
     def __init__(self):
         super().__init__()
         self.parent: ChapterWidget | None

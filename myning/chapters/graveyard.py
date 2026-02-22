@@ -79,8 +79,10 @@ def validate_revive(member: Character):
 
 
 @confirm(
-    lambda member: f"Revive {member.icon} {member.name} for "
-    f"{Formatter.soul_credits(get_soul_cost())} and {Formatter.gold(get_gold_cost(member))}?",
+    lambda member: (
+        f"Revive {member.icon} {member.name} for "
+        f"{Formatter.soul_credits(get_soul_cost())} and {Formatter.gold(get_gold_cost(member))}?"
+    ),
     enter,
     validate_revive,
 )

@@ -30,14 +30,13 @@ deps-compile:
 	pip install -r requirements.txt
 	pip install -r requirements-dev.txt
 
-lint: isort black
-	@true
+lint:
+	ruff check .
+	ruff format --check .
 
-isort:
-	isort . --check --diff
-
-black:
-	black . --check
+format:
+	ruff check --fix .
+	ruff format .
 
 test:
 	pytest
