@@ -10,6 +10,7 @@ from myning.objects.object import Object
 from myning.objects.species import Species
 from myning.utilities.fib import fibonacci, fibonacci_sum
 from myning.utilities.file_manager import FileManager
+from myning.utilities.formatter import Formatter
 from myning.utilities.rand import get_random_int
 from myning.utilities.ui import Colors, Icons, get_health_bar
 
@@ -238,7 +239,8 @@ class Character(Object):
 
     @property
     def exp_str(self):
-        return f"{Colors.XP(f'{self.experience}/{fibonacci(self.level + 1)}')} xp"
+        needed = fibonacci(self.level + 1)
+        return f"{Colors.XP(f'{Formatter.abbreviate(self.experience)}/{Formatter.abbreviate(needed)}')} xp"
 
     @property
     def ghost_str(self):
@@ -278,7 +280,7 @@ class Character(Object):
             Text.from_markup(f"[dodger_blue1]{self.stats['armor']}[/]", justify="right"),
             Text.from_markup(f"[cyan1]{self.level}[/]", justify="right"),
             Text.from_markup(
-                f"[magenta1]{self.experience}/{fibonacci(self.level + 1)}[/]",
+                f"[magenta1]{Formatter.abbreviate(self.experience)}/{Formatter.abbreviate(fibonacci(self.level + 1))}[/]",
                 justify="right",
             ),
             "🪦" if self.is_ghost else " ",
@@ -306,7 +308,7 @@ class Character(Object):
             Text.from_markup(f"[dodger_blue1]{self.stats['armor']}[/]", justify="right"),
             Text.from_markup(f"[cyan1]{self.level}[/]", justify="right"),
             Text.from_markup(
-                f"[magenta1]{self.experience}/{fibonacci(self.level + 1)}[/]",
+                f"[magenta1]{Formatter.abbreviate(self.experience)}/{Formatter.abbreviate(fibonacci(self.level + 1))}[/]",
                 justify="right",
             ),
             "🪦" if self.is_ghost else " ",

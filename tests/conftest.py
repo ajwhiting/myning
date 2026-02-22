@@ -44,7 +44,7 @@ def pytest_addoption(parser):
 
 @pytest.fixture(autouse=True)
 def mock_save():
-    """Mock file save operations"""
+    """Mock file save operations so tests never write to .data/ or the SQLite DB."""
     with (
         patch("myning.utilities.file_manager.FileManager.save"),
         patch("myning.utilities.file_manager.FileManager.multi_save"),

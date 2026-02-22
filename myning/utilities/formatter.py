@@ -3,12 +3,26 @@ from myning.utilities.ui import Colors
 
 class Formatter:
     @staticmethod
+    def abbreviate(n: int | float) -> str:
+        """Format large numbers with a suffix for compact display (e.g. 1_500_000 → '1.5M')."""
+        for threshold, suffix in [
+            (1_000_000_000_000_000, "P"),
+            (1_000_000_000_000, "T"),
+            (1_000_000_000, "B"),
+            (1_000_000, "M"),
+            (1_000, "K"),
+        ]:
+            if n >= threshold:
+                return f"{n / threshold:.1f}{suffix}"
+        return str(int(n))
+
+    @staticmethod
     def gold(g: int):
         return Colors.GOLD(f"{g:,}g")
 
     @staticmethod
     def xp(x: int):
-        return Colors.XP(f"{x} xp")
+        return Colors.XP(f"{Formatter.abbreviate(x)} xp")
 
     @staticmethod
     def soul_credits(sc: float):

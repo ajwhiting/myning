@@ -1,7 +1,3 @@
-from functools import cache
-
-
-@cache
 def fibonacci(n: int) -> int:
     match n:
         case 1:
@@ -12,10 +8,21 @@ def fibonacci(n: int) -> int:
             return 3
         case 4:
             return 5
-        case _:
-            return fibonacci(n - 1) + fibonacci(n - 2)
+    a, b = 3, 5
+    for _ in range(n - 4):
+        a, b = b, a + b
+    return b
 
 
-@cache
-def fibonacci_sum(n: int):
-    return sum(fibonacci(i) for i in range(1, n + 1))
+def fibonacci_sum(n: int) -> int:
+    if n <= 0:
+        return 0
+    base = [0, 1, 3, 5]
+    total = sum(base[:n])
+    if n <= 4:
+        return total
+    a, b = 3, 5
+    for _ in range(n - 4):
+        a, b = b, a + b
+        total += b
+    return total

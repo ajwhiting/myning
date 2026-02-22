@@ -8,6 +8,7 @@ from . import (
     research_transfer,
     soul_credits,
     species_pokedex,
+    sqlite_migration,
     stats_transfer,
 )
 
@@ -22,4 +23,5 @@ MIGRATIONS = {
     8: blacksmith_upgrade,
     9: graveyard_transfer,
     10: inventory_transfer,
+    11: sqlite_migration,
 }

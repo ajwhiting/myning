@@ -6,6 +6,7 @@ from rich.text import Text
 
 from myning.objects.character import Character
 from myning.utilities.fib import fibonacci
+from myning.utilities.formatter import Formatter
 from myning.utilities.ui import Colors, Icons, get_health_bar
 
 
@@ -78,7 +79,7 @@ class Army(UserList[Character]):
                 f"[red1]{member.stats['damage']}[/]",
                 f"[dodger_blue1]{member.stats['armor']}[/]",
                 f"[cyan1]{member.level}[/]",
-                f"[magenta1]{member.experience}/{fibonacci(member.level + 1)}[/]",
+                f"[magenta1]{Formatter.abbreviate(member.experience)}/{Formatter.abbreviate(fibonacci(member.level + 1))}[/]",
                 "🪦" if member.is_ghost else " ",
             )
         return table
