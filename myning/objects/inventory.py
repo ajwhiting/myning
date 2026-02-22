@@ -12,13 +12,10 @@ class Inventory(Object, metaclass=Singleton):
     def initialize(cls):
         inventory = FileManager.load(Inventory, cls.file_name)
         if not inventory:
-            inventory = cls()
+            inventory = cls._create()
         cls._instance = inventory
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "inventory"
+    file_name = "inventory"
 
     def __init__(self):
         self._items: dict[ItemType, list[Item]] = {}
@@ -89,7 +86,7 @@ class Inventory(Object, metaclass=Singleton):
 
     @classmethod
     def from_dict(cls, data: dict) -> "Inventory":
-        inventory = Inventory()
+        inventory = cls._create()
         for item_type, items_ids in data.items():
             inventory._items[item_type] = []
             for item_id in items_ids:

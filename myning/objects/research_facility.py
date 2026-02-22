@@ -15,7 +15,7 @@ class ResearchFacility(Object, metaclass=Singleton):
     def initialize(cls):
         facility = FileManager.load(ResearchFacility, cls.file_name)
         if not facility:
-            facility = cls()
+            facility = cls._create()
         cls._instance = facility
 
     def __init__(
@@ -35,10 +35,7 @@ class ResearchFacility(Object, metaclass=Singleton):
         if len(self._researchers) > level:
             raise Exception("Too many researchers for this level")
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "research_facility"
+    file_name = "research_facility"
 
     @property
     def army(self):
@@ -68,7 +65,7 @@ class ResearchFacility(Object, metaclass=Singleton):
     @classmethod
     def from_dict(cls, data: dict):
         if not data:
-            return ResearchFacility(1)
+            return cls._create(1)
 
         researched = []
         for research in data.get("research") or []:
@@ -77,7 +74,7 @@ class ResearchFacility(Object, metaclass=Singleton):
             researched.append(RESEARCH[id])
             researched[-1].level = level
 
-        return ResearchFacility(
+        return cls._create(
             data["level"],
             data["points"],
             datetime.strptime(data["last_research_tick"], "%Y-%m-%dT%H:%M:%S.%f")

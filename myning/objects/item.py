@@ -17,11 +17,6 @@ class ItemType(str, Enum):
     SHOES = "shoes"
     PLANT = "plant"
 
-    @classmethod
-    @property
-    def values(cls) -> list[str]:
-        return list(map(lambda c: c.value, cls))
-
 
 class Item(Object):
     def __init__(

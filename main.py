@@ -2,6 +2,7 @@ import builtins
 
 import rich
 
+from myning.config import load_config
 from myning.migrations.migrate import check_for_migrations
 from myning.objects.game import Game
 from myning.objects.garden import Garden
@@ -25,6 +26,7 @@ def main():
     check_for_updates()
     check_for_migrations()
 
+    load_config()
     FileManager.setup()
     Player.initialize()
 

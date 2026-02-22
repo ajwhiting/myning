@@ -42,19 +42,19 @@ class Plant(Item):
         }
 
     @classmethod
-    def from_dict(cls, dict: dict):
-        if not dict:
+    def from_dict(cls, data: dict):
+        if not data:
             return None
 
-        cls = super().from_dict(dict)
-        cls.plant_type = dict["plant_type"]
-        cls.started = None
-        if dict.get("started"):
-            cls.started = datetime.strptime(dict["started"], "%Y-%m-%dT%H:%M:%S.%f")
-        if dict.get("harvested"):
-            cls.harvested = datetime.strptime(dict["harvested"], "%Y-%m-%dT%H:%M:%S.%f")
+        plant = super().from_dict(data)
+        plant.plant_type = data["plant_type"]
+        plant.started = None
+        if data.get("started"):
+            plant.started = datetime.strptime(data["started"], "%Y-%m-%dT%H:%M:%S.%f")
+        if data.get("harvested"):
+            plant.harvested = datetime.strptime(data["harvested"], "%Y-%m-%dT%H:%M:%S.%f")
 
-        return cls
+        return plant
 
     def sow(self):
         self.started = datetime.now()

@@ -5,10 +5,7 @@ T = TypeVar("T", bound="Object")
 
 
 class Object:
-    @property
-    @abstractmethod
-    def file_name(self) -> str:
-        pass
+    file_name: str
 
     @abstractmethod
     def to_dict(self) -> dict:

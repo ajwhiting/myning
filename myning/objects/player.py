@@ -22,7 +22,7 @@ class Player(Character, metaclass=Singleton):
         if not player:
             while not name:
                 name = input("\nEnter your player name: ")
-            player = cls(name)
+            player = cls._create(name)
             player._allies = []
             player._fired_allies = []
             player.gold = 1
@@ -69,7 +69,6 @@ class Player(Character, metaclass=Singleton):
             + upgrades_value
             + unlocked_mines
             + self.gold
-            + upgrades_value
             + beaten_mines
         )
 
@@ -132,10 +131,7 @@ class Player(Character, metaclass=Singleton):
     def ghost_count(self):
         return len([ally for ally in self.allies if ally.is_ghost])
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "player"
+    file_name = "player"
 
     def to_dict(self):
         character = super().to_dict()

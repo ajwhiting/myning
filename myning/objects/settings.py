@@ -15,7 +15,7 @@ class Settings(Object, metaclass=Singleton):
     def initialize(cls):
         trip = FileManager.load(Settings, cls.file_name)
         if not trip:
-            trip = cls()
+            trip = cls._create()
         cls._instance = trip
 
     def __init__(
@@ -34,7 +34,7 @@ class Settings(Object, metaclass=Singleton):
 
     @classmethod
     def from_dict(cls, attrs: dict):
-        return cls(**attrs)
+        return cls._create(**attrs)
 
     def to_dict(self) -> dict:
         return {
@@ -45,10 +45,7 @@ class Settings(Object, metaclass=Singleton):
             "sort_order": self.sort_order,
         }
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "settings"
+    file_name = "settings"
 
     def set_army_columns(self, value: int):
         if self.army_columns >= 5 <= 25:
