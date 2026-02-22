@@ -108,8 +108,9 @@ class Store(BaseStore):
         )
 
     @confirm(
-        lambda self, item: f"Are you sure you want to sell {item} for "
-        f"{Formatter.gold(sell_price(item))}?",
+        lambda self, item: (
+            f"Are you sure you want to sell {item} for {Formatter.gold(sell_price(item))}?"
+        ),
         pick_sell,
     )
     def sell(self, item: Item):

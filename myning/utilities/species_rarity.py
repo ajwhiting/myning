@@ -47,7 +47,8 @@ def get_current_tier():
 def _recruit_in_tier(tier: list[CharacterSpecies]):
     player = Player()
 
-    is_undiscovered = lambda species_name: SPECIES[species_name] not in player.discovered_species
+    def is_undiscovered(species_name):
+        return SPECIES[species_name] not in player.discovered_species
 
     facility = ResearchFacility()
     percent_boost = 0.0

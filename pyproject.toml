@@ -1,28 +1,53 @@
-[tool.black]
-line-length = 100
-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.githooks
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | yoyo
-  )/
-  | setup.py
-)
-'''
+[project]
+name = "myning"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp",
+    "chafa.py",
+    "pillow",
+    "pyyaml",
+    "textual",
+]
 
-[tool.isort]
-profile = "black"
-line_length = 100
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["myning"]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "ruff",
+    "textual-dev",
+    "ty",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "W",   # pycodestyle warnings
+]
+ignore = [
+    "E501",  # line too long — handled by formatter where possible; many game strings are intentionally long
+]
+
+[tool.ruff.lint.per-file-ignores]
+"myning/api/__init__.py" = ["E402", "F401"]  # intentional late import with side effects
+"tests/conftest.py" = ["E402"]  # singletons must init before TUI imports
+
+[tool.ruff.lint.isort]
+known-first-party = ["myning"]
 
 [tool.pytest.ini_options]
 addopts = "-svx --cov=. --cov-report=term --cov-report=html"

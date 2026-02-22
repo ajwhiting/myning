@@ -1,4 +1,5 @@
 import string
+from typing import Protocol, runtime_checkable
 
 from rich.text import Text
 from textual import events
@@ -11,13 +12,11 @@ from myning.chapters import (
     ExitArgs,
     Handler,
     Option,
-    OptionLabel,
     PickArgs,
     main_menu,
     mine,
     tutorial,
 )
-from myning.chapters.garden.garden_table import GardenTable
 from myning.chapters.mine.screen import MineScreen
 from myning.objects.player import Player
 from myning.objects.trip import Trip
@@ -33,13 +32,51 @@ player = Player()
 trip = Trip()
 
 
+@runtime_checkable
+class ChapterKeyHandler(Protocol):
+    """Protocol for widgets that need to handle chapter-level key events.
+
+    Widgets implementing this protocol will receive unhandled keys from ChapterWidget
+    and can reserve additional hotkeys (e.g. h/l for left/right navigation).
+    """
+
+    extra_hotkey_aliases: dict[str, str]
+    """Additional key aliases to register when this widget is active (e.g. {"h": "left"})."""
+
+    async def handle_chapter_key(self, key: str) -> None: ...
+
+
 HOTKEY_ALIASES = {
     "j": "down",
     "k": "up",
     "ctrl_d": "pagedown",
     "ctrl_u": "pageup",
 }
-RESERVED_HOTKEYS = {"j", "k", "q"}
+BASE_RESERVED_HOTKEYS = {"j", "k", "q"}
+RESERVED_HOTKEYS = set(BASE_RESERVED_HOTKEYS)
+
+
+def _find_key_handler(widget: "ChapterWidget") -> ChapterKeyHandler | None:
+    """Find the first child widget implementing ChapterKeyHandler."""
+    for child in widget.children:
+        if isinstance(child, ChapterKeyHandler):
+            return child
+    return None
+
+
+def _sync_hotkey_overrides(widget: "ChapterWidget"):
+    """Add/remove hotkey aliases based on whether a ChapterKeyHandler is mounted."""
+    handler = _find_key_handler(widget)
+    # Reset to base state
+    for key in list(HOTKEY_ALIASES):
+        if key not in ("j", "k", "ctrl_d", "ctrl_u"):
+            del HOTKEY_ALIASES[key]
+    RESERVED_HOTKEYS.clear()
+    RESERVED_HOTKEYS.update(BASE_RESERVED_HOTKEYS)
+
+    if handler:
+        HOTKEY_ALIASES.update(handler.extra_hotkey_aliases)
+        RESERVED_HOTKEYS.update(handler.extra_hotkey_aliases)
 
 
 class ChapterWidget(ScrollableContainer):
@@ -90,13 +127,12 @@ class ChapterWidget(ScrollableContainer):
             self.option_table.scroll_page_left()
         elif key in ("upper_l", "ctrl_f"):
             self.option_table.scroll_page_right()
-        elif garden_query := self.query("GardenTable"):
-            garden_table = garden_query.first(GardenTable)
-            await garden_table.handle_chapter_key(key)
-        elif binding := self.option_table._bindings.keys.get(  # pylint: disable=protected-access
+        elif handler := _find_key_handler(self):
+            await handler.handle_chapter_key(key)
+        elif bindings := self.option_table._bindings.key_to_bindings.get(  # pylint: disable=protected-access
             key
         ):
-            await self.option_table.run_action(binding.action)
+            await self.option_table.run_action(bindings[0].action)
 
     async def on_data_table_row_selected(self, row: DataTable.RowSelected):
         self.focus()
@@ -115,18 +151,7 @@ class ChapterWidget(ScrollableContainer):
             TabTitle.change_tab_status(title)
         self.question.message = args.message
         self.question.subtitle = args.subtitle or ""
-        if self.query("GardenTable"):
-            HOTKEY_ALIASES["h"] = "left"
-            HOTKEY_ALIASES["l"] = "right"
-            RESERVED_HOTKEYS.add("h")
-            RESERVED_HOTKEYS.add("l")
-        else:
-            if "h" in RESERVED_HOTKEYS:
-                del HOTKEY_ALIASES["h"]
-                RESERVED_HOTKEYS.remove("h")
-            if "l" in RESERVED_HOTKEYS:
-                del HOTKEY_ALIASES["l"]
-                RESERVED_HOTKEYS.remove("l")
+        _sync_hotkey_overrides(self)
         options, hotkeys = get_labels_and_hotkeys(args.options)
         self.option_table.clear(columns=True)
         if options:
@@ -155,13 +180,12 @@ class ChapterWidget(ScrollableContainer):
         elif isinstance(args, AsyncArgs):
             await args.callback(self)
         else:
-            if (module := handler.__module__.rpartition(".")[-1]) not in (
-                "functools",
-                "pick",
-            ) and "base" not in module:
-                title = module.replace("_", " ").title()
-                self.border_title = title
-                TabTitle.change_tab_status(title)
+            if not args.border_title:
+                if (module := handler.__module__.rpartition(".")[-1]) not in (
+                    "functools",
+                    "pick",
+                ) and "base" not in module:
+                    args.border_title = module.replace("_", " ").title()
             self.pick(args)
 
     def clear(self):

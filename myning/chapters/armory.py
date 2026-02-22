@@ -67,13 +67,13 @@ def pick_equipment(c: Character, slot: ItemType):
     items = inventory.get_slot(slot)
     if not items:
         return PickArgs(
-            message=f"You have no {slot}.",
+            message=f"You have no {slot.value}.",
             options=[Option("Bummer", partial(pick_slot, c))],
         )
     options = [Option(item.arr, partial(equip, c, item)) for item in items]
     options.append(Option(["", "Go Back"], partial(pick_slot, c)))
     return PickArgs(
-        message=f"Choose {slot} to equip:\n",
+        message=f"Choose {slot.value} to equip:\n",
         options=options,
         subtitle=c.equipment_table,
     )

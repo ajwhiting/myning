@@ -1,5 +1,0 @@
-aiohttp
-chafa.py
-pillow
-pyyaml
-textual==0.32.0 # Lock to fix mine screen border bug

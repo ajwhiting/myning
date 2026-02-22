@@ -8,23 +8,16 @@ This file provides guidance for AI assistants working in this repository.
 
 ## Development Environment
 
-**Python version:** 3.10 (enforced; use pyenv)
+**Python version:** 3.13 (managed by uv)
 
 ### Setup
 
 ```bash
-# Create and activate virtualenv with pyenv
-make venv        # production dependencies only
-make venv-dev    # production + development dependencies
-
-# Install deps into an existing venv
-make deps-install
-
-# Recompile pinned dependencies from *.in source files
-make deps-compile
+# Install everything (production + dev dependencies)
+make sync
 ```
 
-Dependencies are managed with `pip-tools`. Edit `requirements.in` / `requirements-dev.in` and run `make deps-compile` to update the pinned `requirements.txt` / `requirements-dev.txt`.
+Dependencies are managed with `uv`. Edit `pyproject.toml` (`[project] dependencies` for prod, `[dependency-groups] dev` for dev) and run `make lock` to regenerate `uv.lock`.
 
 ## Running the Game
 
@@ -44,33 +37,26 @@ For TUI debugging, `make dev` launches a Textual console alongside the game.
 ### Linting (must pass before committing)
 
 ```bash
-make lint    # runs both isort and black in check mode
-```
-
-Individual tools:
-```bash
-isort . --check --diff   # import ordering
-black . --check          # code formatting
+make lint    # runs ruff check + ruff format --check
 ```
 
 To auto-fix:
 ```bash
-isort .
-black .
+make format  # runs ruff check --fix + ruff format
 ```
 
 ### Code style rules
 
-- **Line length:** 100 characters (Black + isort both configured to this)
-- **Import ordering:** isort with `profile = "black"`
-- **Formatter:** Black (no manual style decisions)
+- **Line length:** 100 characters (configured in `pyproject.toml`)
+- **Linter + formatter:** [Ruff](https://docs.astral.sh/ruff/) (replaces Black + isort)
+- **Pre-commit:** `.pre-commit-config.yaml` runs ruff on staged files
 
 ## Testing
 
 ```bash
-make test                  # run full suite with coverage
-pytest --headed            # run with visible TUI (useful for debugging chapter tests)
-pytest tests/path/to/test  # run a specific test file
+make test                       # run full suite with coverage
+uv run pytest --headed          # run with visible TUI (useful for debugging chapter tests)
+uv run pytest tests/path/to/test  # run a specific test file
 ```
 
 ### Test configuration (`pyproject.toml`)
@@ -90,14 +76,14 @@ Key fixtures available in all tests:
 - `mock_save` *(autouse)* — patches `FileManager.save` and `FileManager.multi_save` so tests never write to disk
 - `reset_objects` *(autouse)* — resets player, inventory, and trip state before each test
 
-**Important:** Always initialize singleton objects (Player, Game, Inventory, Trip) before importing TUI modules in tests. See `conftest.py` for the established pattern.
+**Important:** Always initialize **all** singleton objects before importing TUI modules in tests (TUI and chapter modules reference singletons at module level). See `conftest.py` for the established pattern.
 
 ## CI/CD
 
-GitHub Actions (`.github/workflows/ci.yml`) runs on push/PR to `main`:
-1. `isort . --check --diff`
-2. `black . --check`
-3. `pytest`
+GitHub Actions (`.github/workflows/ci.yml`) runs on push/PR to `main` using `uv`:
+1. `uv run ruff check .`
+2. `uv run ruff format --check .`
+3. `uv run pytest`
 
 All three must pass for a PR to merge.
 
@@ -218,5 +204,4 @@ tests/
 3. **Singletons initialize once** — call `ClassName.initialize(...)` at startup (see `main.py`), then use `ClassName()` anywhere to get the instance.
 4. **Chapter handlers are pure functions** — they receive no arguments and return `PickArgs`, `DynamicArgs`, etc. Side effects happen in callbacks.
 5. **Mock saves in tests** — the `mock_save` autouse fixture prevents disk writes. Do not patch it out in individual tests.
-6. **Textual version is pinned to 0.32.0** — a specific version is required due to a mine screen border rendering bug. Do not upgrade without testing the mine screen thoroughly.
-7. **Exit codes are meaningful** — code `123` triggers time travel restart, code `122` triggers update restart (handled by `run.sh`/`dev.sh`).
+6. **Exit codes are meaningful** — code `123` triggers time travel restart, code `122` triggers update restart (handled by `run.sh`/`dev.sh`).

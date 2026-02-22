@@ -1,43 +1,25 @@
 play:
-	@./run.sh
+	@uv run ./run.sh
 
 dev:
-	@./dev.sh
+	@uv run ./dev.sh
 
 migrate:
-	python migrate.py $(id)
+	uv run python migrate.py $(id)
 
-venv:
-	pyenv install 3.10 --skip-existing
-	pyenv virtualenv -f 3.10 myning
-	pyenv local myning
-	pip install -r requirements.txt
+sync:
+	uv sync --group dev
 
-venv-dev:
-	pyenv install 3.10 --skip-existing
-	pyenv virtualenv -f 3.10 myning-dev
-	pyenv local myning-dev
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
+lock:
+	uv lock
 
-deps-install:
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
+lint:
+	uv run ruff check .
+	uv run ruff format --check .
 
-deps-compile:
-	pip-compile --no-emit-index-url --no-emit-trusted-host requirements.in
-	pip-compile --no-emit-index-url --no-emit-trusted-host requirements-dev.in
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
-
-lint: isort black
-	@true
-
-isort:
-	isort . --check --diff
-
-black:
-	black . --check
+format:
+	uv run ruff check --fix .
+	uv run ruff format .
 
 test:
-	pytest
+	uv run pytest

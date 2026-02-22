@@ -4,7 +4,8 @@ __pycache__
 .DS_Store
 .envrc
 .idea
-.python-version
+.venv
 .vscode
 coverage.xml
 htmlcov/
+.claude/

@@ -16,7 +16,7 @@ from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
 from myning.utilities.generators import generate_character
 from myning.utilities.pick import confirm
-from myning.utilities.ui import Colors, Icons
+from myning.utilities.ui import Icons
 
 if TYPE_CHECKING:
     from myning.tui.chapter import ChapterWidget
@@ -207,7 +207,7 @@ def add_xp_manually(member: Character):
         f"How much of your {Formatter.xp(player.exp_available)} "
         f"would you like to give {member.name} ({member.exp_str})?"
     )
-    placeholder = f"{xp_for_level} xp until level {member.level+1}"
+    placeholder = f"{xp_for_level} xp until level {member.level + 1}"
 
     def add_xp_callback(chapter: "ChapterWidget"):
         def screen_callback(xp: int | None):

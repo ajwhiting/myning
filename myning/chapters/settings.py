@@ -26,13 +26,15 @@ def enter():
 
 
 @confirm(
-    lambda: f"Are you sure you want to {'enable' if settings.mini_games_disabled else 'disable'} "
-    "Minigames?\n"
-    + Formatter.locked(
-        "Minigames allow you to speed up progress, earn more minerals, and have greater "
-        "success in the mines. If you disable them, you will not be able to benefit from the "
-        "bonuses they provide or skip time when there normally would be a mini-game. You can "
-        "always enable and disable them in the settings."
+    lambda: (
+        f"Are you sure you want to {'enable' if settings.mini_games_disabled else 'disable'} "
+        "Minigames?\n"
+        + Formatter.locked(
+            "Minigames allow you to speed up progress, earn more minerals, and have greater "
+            "success in the mines. If you disable them, you will not be able to benefit from the "
+            "bonuses they provide or skip time when there normally would be a mini-game. You can "
+            "always enable and disable them in the settings."
+        )
     ),
     enter,
 )

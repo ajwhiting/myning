@@ -57,13 +57,15 @@ class BaseStore(ABC):
         store_name = self.__class__.__name__.lower()
         return sorted(
             self._items,
-            key=lambda i: i.value
-            if (
-                player.has_upgrade("sort_by_value")
-                and store_name in UPGRADES["sort_by_value"].player_value
-                and settings.sort_order == SortOrder.VALUE
-            )
-            else i.type,
+            key=lambda i: (
+                i.value
+                if (
+                    player.has_upgrade("sort_by_value")
+                    and store_name in UPGRADES["sort_by_value"].player_value
+                    and settings.sort_order == SortOrder.VALUE
+                )
+                else i.type
+            ),
         )
 
     @property

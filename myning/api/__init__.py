@@ -7,7 +7,7 @@ import aiohttp
 
 # Needed once we had username and passwords
 def basic_auth(username, password):
-    return f'Basic {b64encode(bytes(f"{username}:{password}", "utf-8")).decode("ascii")}'
+    return f"Basic {b64encode(bytes(f'{username}:{password}', 'utf-8')).decode('ascii')}"
 
 
 API_CONFIG = {
