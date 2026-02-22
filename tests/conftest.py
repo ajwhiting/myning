@@ -95,4 +95,4 @@ def pilot(app_and_pilot):
 
 @pytest.fixture
 def chapter(app: MyningApp):
-    yield app.query_one("ChapterWidget", ChapterWidget)
+    yield app.screen.query_one("ChapterWidget", ChapterWidget)

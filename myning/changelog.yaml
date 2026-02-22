@@ -1,3 +1,7 @@
+- name: Boss Encounters
+  description: Mines with win criteria can now have a boss that must be defeated before the mine counts as completed. Defeat Grix the Goblin Leader in the Hole in the ground!
+  date: 02-22-26
+
 - name: Research Species Stats
   description: Ever wanted to know the EXACT stats of a species? It's possible now thanks to research!
   date: 08-30-23

@@ -21,6 +21,7 @@ class IntegerStatKeys(str, Enum):
     GOLD_EARNED = "gold_earned"
     FALLEN_SOLDIERS = "fallen_soldiers"
     DISCOVERED_SPECIES = "discovered_species"
+    BOSSES_DEFEATED = "bosses_defeated"
 
     # Need implementation
     GOLD_SPENT_ON_GEAR = "gold_spent_on_gear"

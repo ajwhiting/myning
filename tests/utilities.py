@@ -5,7 +5,7 @@ from myning.tui.chapter.option_table import OptionTable
 
 
 def get_option(app: MyningApp, index: int):
-    option_table = app.query_one("OptionTable", OptionTable)
+    option_table = app.screen.query_one("OptionTable", OptionTable)
     arr = []
     for x in option_table.get_row_at(index):
         if not x:

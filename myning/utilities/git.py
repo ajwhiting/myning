@@ -23,7 +23,7 @@ def check_for_updates():
 
     old_changelog = get_changelog()
     os.system("git pull")
-    os.system("pip install -r requirements.txt > /dev/null")
+    os.system("uv sync > /dev/null")
     changelog = get_changelog()
     changelog.reverse()
 

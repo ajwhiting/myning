@@ -75,7 +75,8 @@ class Character(Object):
 
     @property
     def max_health(self):
-        return self.level * self.health_mod
+        base = self.level * self.health_mod
+        return getattr(self, "_max_health_override", base)
 
     @property
     def _level_stats(self):

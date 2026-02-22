@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from rich.progress_bar import ProgressBar
@@ -8,6 +9,20 @@ from myning.objects.mine_stats import MineStats
 from myning.objects.object import Object
 from myning.utilities.formatter import Formatter
 from myning.utilities.ui import Colors, Icons
+
+
+@dataclass(frozen=True)
+class BossConfig:
+    name: str
+    image: str
+    level: int
+    health_multiplier: float
+    max_items: int
+    max_item_level: int
+    item_scale: float
+    intro_text: str
+    victory_text: str
+    reward_multiplier: int
 
 
 class MineType(str, Enum):
@@ -34,6 +49,7 @@ class Mine(Object):
         self.player_progress: MineStats = None
         self.resource = None
         self.companion_rarity = 0
+        self.boss: BossConfig | None = None
 
     @property
     def file_name(self):
@@ -67,6 +83,20 @@ class Mine(Object):
         )
         mine.resource = dict["resource"] if "resource" in dict else None
         mine.companion_rarity = dict.get("companion_rarity", 0)
+        boss_data = dict.get("boss")
+        if boss_data:
+            mine.boss = BossConfig(
+                name=boss_data["name"],
+                image=boss_data["image"],
+                level=boss_data["level"],
+                health_multiplier=boss_data["health_multiplier"],
+                max_items=boss_data["max_items"],
+                max_item_level=boss_data["max_item_level"],
+                item_scale=boss_data["item_scale"],
+                intro_text=boss_data["intro_text"],
+                victory_text=boss_data["victory_text"],
+                reward_multiplier=boss_data["reward_multiplier"],
+            )
         return mine
 
     def to_dict(self) -> dict:
@@ -86,6 +116,20 @@ class Mine(Object):
             "win_criteria": self.win_criteria.to_dict() if self.win_criteria else None,
             "resource": self.resource,
             "companion_rarity": self.companion_rarity,
+            "boss": {
+                "name": self.boss.name,
+                "image": self.boss.image,
+                "level": self.boss.level,
+                "health_multiplier": self.boss.health_multiplier,
+                "max_items": self.boss.max_items,
+                "max_item_level": self.boss.max_item_level,
+                "item_scale": self.boss.item_scale,
+                "intro_text": self.boss.intro_text,
+                "victory_text": self.boss.victory_text,
+                "reward_multiplier": self.boss.reward_multiplier,
+            }
+            if self.boss
+            else None,
         }
 
     @property
@@ -165,11 +209,10 @@ class Mine(Object):
         closest_key_floor = max(c for c in chances if c < odds)
         return f"{Icons.DEATH} {chances[closest_key_floor]}"
 
-    @property
-    def arr(self):
+    def arr(self, cleared: bool = False):
         arr = [self.icon, self.name, self.death_chance_str]
         if self.win_criteria:
-            if self.complete:
+            if cleared:
                 arr.append("✨ cleared ✨")
             else:
                 arr.append(self.progress_bar)

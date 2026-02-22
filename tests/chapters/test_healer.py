@@ -1,5 +1,6 @@
 from textual.pilot import Pilot
 
+from myning.chapters.healer import HealScreen
 from myning.objects.player import Player
 from myning.tui.app import MyningApp
 from myning.tui.chapter import ChapterWidget
@@ -15,7 +16,7 @@ async def test_healer(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
     assert chapter.question.message == "Start Recovery?"
 
     await pilot.press("enter")
-    assert app.query("HealScreen")
+    assert isinstance(app.screen, HealScreen)
 
     await pilot.press("enter")
     assert player.health == player.max_health

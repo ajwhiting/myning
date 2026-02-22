@@ -4,8 +4,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import lru_cache
 
+from chafa import Canvas, CanvasConfig, PixelType
+from PIL import Image
 from rich.console import RenderableType
 from rich.table import Table
+from rich.text import Text
 from textual.widget import Widget
 
 from myning.chapters.mine.mining_minigame import MiningMinigame, MiningScore
@@ -14,6 +17,7 @@ from myning.objects.character import Character
 from myning.objects.graveyard import Graveyard
 from myning.objects.inventory import Inventory
 from myning.objects.item import Item
+from myning.objects.mine import BossConfig
 from myning.objects.player import Player
 from myning.objects.settings import Settings
 from myning.objects.stats import IntegerStatKeys, Stats
@@ -372,6 +376,126 @@ class LoseAllyAction(Action):
     @property
     def content(self):
         return self.message
+
+
+@lru_cache(maxsize=4)
+def _render_boss_art(boss_config: BossConfig) -> Text:
+    config = CanvasConfig()
+    image = Image.open(f"./{boss_config.image}").convert("RGB")
+    config.width = 80
+    config.height = 35
+    config.calc_canvas_geometry(image.width, image.height, 11 / 24)
+    bands = len(image.getbands())
+    pixels = image.tobytes()
+    canvas = Canvas(config)
+    canvas.draw_all_pixels(
+        PixelType.CHAFA_PIXEL_RGB8,
+        pixels,  # type: ignore
+        image.width,
+        image.height,
+        image.width * bands,
+    )
+    output = canvas.print()
+    return Text.from_ansi(output.decode())
+
+
+class BossIntroAction(Action):
+    def __init__(self, boss_config: BossConfig):
+        self.boss_config = boss_config
+        self._art = _render_boss_art(boss_config)
+        super().__init__(7)
+
+    @property
+    def content(self):
+        table = Table.grid()
+        table.add_row(f"[bold red1]{Icons.BOSS} BOSS ENCOUNTER! {Icons.BOSS}[/]\n")
+        table.add_row(f"[bold]{self.boss_config.name}[/]\n")
+        table.add_row(self._art)
+        table.add_row(f"\n{self.boss_config.intro_text}\n")
+        table.add_row(f"Prepare yourself... ({self.duration})")
+        return table
+
+    @property
+    @lru_cache(maxsize=1)
+    def next(self):
+        return BossCombatAction(self.boss_config)
+
+
+class BossCombatAction(CombatAction):
+    def __init__(self, boss_config: BossConfig, *, enemies: Army | None = None, round: int = 1):
+        self.boss_config = boss_config
+        self._art = _render_boss_art(boss_config)
+        if enemies is None:
+            boss_char = generate_character(
+                [boss_config.level, boss_config.level],
+                is_enemy=True,
+                max_items=boss_config.max_items,
+                max_item_level=boss_config.max_item_level,
+                item_scale=boss_config.item_scale,
+            )
+            boss_char.name = boss_config.name
+            boss_char._max_health_override = int(
+                boss_char.max_health * boss_config.health_multiplier
+            )
+            boss_char.health = boss_char._max_health_override
+            enemies = Army([boss_char])
+        super().__init__(enemies=enemies, round=round)
+
+    @property
+    def content(self):
+        player_army = Army(player.army.living_members)
+        enemy_army = Army(self.enemies.living_members)
+        left = Table.grid()
+        left.add_row(f"[bold red1]{Icons.BOSS} BOSS BATTLE: {self.boss_config.name}[/]\n")
+        left.add_row(f"[bold]Round {self.round}[/]")
+        left.add_row(f"Fighting... ({self.duration} seconds left)\n")
+        left.add_row("⚔️   " * (5 - (self.duration - 1) % 5))
+        left.add_row("\n[bold]Your Army[/]")
+        left.add_row(player_army.compact_view if settings.compact_mode else player_army.battle_view)
+        left.add_row(f"\n[bold]{Icons.BOSS} Boss[/]")
+        left.add_row(enemy_army.compact_view if settings.compact_mode else enemy_army.battle_view)
+        content_table = Table.grid(padding=(0, 2, 0, 0))
+        content_table.add_row(left, self._art)
+        return content_table
+
+    @property
+    @lru_cache(maxsize=1)
+    def next(self):
+        self.fight()
+        if player.army.defeated:
+            return None
+        if self.enemies.defeated:
+            trip.add_battle(len(self.enemies), True)
+            FileManager.save(trip)
+            return BossVictoryAction(self.boss_config)
+        next_combat = BossCombatAction(self.boss_config, enemies=self.enemies, round=self.round + 1)
+        return RoundAction(self.damage_done, self.damage_taken, self.round_logs, next_combat)
+
+
+class BossVictoryAction(Action):
+    def __init__(self, boss_config: BossConfig):
+        TabTitle.change_tab_subactivity("")
+        self.boss_config = boss_config
+        trip.boss_defeated = True
+        assert trip.mine
+        rewards = []
+        for _ in range(boss_config.reward_multiplier):
+            rewards.extend(generate_reward(trip.mine.max_item_level, 1))
+        trip.add_items(*rewards)
+        FileManager.multi_save(trip, *rewards)
+        self.rewards = rewards
+        super().__init__(len(rewards) + 1)
+
+    @property
+    def content(self):
+        lines = [f"[bold green1]{Icons.BOSS} {self.boss_config.victory_text}[/]\n"] + [
+            item.battle_new_str for item in self.rewards[: len(self.rewards) - self.duration + 1]
+        ]
+        return "\n".join(lines)
+
+    @property
+    def next(self):
+        return self if self.duration > 1 else None
 
 
 def _get_battle_order(allies: list[Character], enemies: list[Character]):

@@ -139,10 +139,10 @@ class ChapterWidget(ScrollableContainer):
         await self.select(row.cursor_row)
 
     def update_dashboard(self):
-        if self.app.query("SideBar"):
-            self.app.query_one("ArmyWidget", ArmyWidget).update()
-            self.app.query_one("CurrencyWidget", CurrencyWidget).refresh()
-            self.app.query_one("InventoryWidget", InventoryWidget).update()
+        if self.screen.query("SideBar"):
+            self.screen.query_one("ArmyWidget", ArmyWidget).update()
+            self.screen.query_one("CurrencyWidget", CurrencyWidget).refresh()
+            self.screen.query_one("InventoryWidget", InventoryWidget).update()
 
     def pick(self, args: PickArgs):
         self.update_dashboard()

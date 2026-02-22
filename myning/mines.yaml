@@ -26,6 +26,17 @@ Hole in the ground:
     kills: 10
     minutes: 15
     minerals: 30
+  boss:
+    name: Grix the Goblin Leader
+    image: images/goblin.png
+    level: 5
+    health_multiplier: 0.8
+    max_items: 3
+    max_item_level: 4
+    item_scale: 2
+    intro_text: "A massive goblin emerges from the depths, brandishing a crude mace..."
+    victory_text: "The Goblin Leader crumbles! The mine is yours!"
+    reward_multiplier: 3
 
 Small pit:
   type: regular

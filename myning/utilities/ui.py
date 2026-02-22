@@ -1,9 +1,10 @@
 import math
-from enum import Enum
+from enum import StrEnum
 
 
-class Icons(str, Enum):
+class Icons(StrEnum):
     ARMOR = "🛡 "
+    BOSS = "👑"
     ARMORY = "🛡"
     BARRACKS = "⛺️"
     BLACKSMITH = "🔨"
@@ -48,7 +49,7 @@ class Icons(str, Enum):
     XP = "✨"
 
 
-class Colors(str, Enum):
+class Colors(StrEnum):
     ARMOR = "dodger_blue1"
     GOLD = "gold1"
     LEVEL = "cyan1"

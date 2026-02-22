@@ -9,6 +9,8 @@ from textual.widgets import Footer, ProgressBar, Static
 
 from myning.chapters.mine.actions import (
     Action,
+    BossIntroAction,
+    BossVictoryAction,
     CombatAction,
     EquipmentAction,
     ItemsAction,
@@ -50,7 +52,8 @@ class MineScreen(Screen[bool]):
         ("c", "compact", "Toggle Compact Mode"),
     ]
 
-    def __init__(self) -> None:
+    def __init__(self, boss_only: bool = False) -> None:
+        self.boss_only = boss_only
         self.content_container = ScrollableContainer()
         self.content = Static()
         self.sidebar = Vertical()
@@ -59,6 +62,24 @@ class MineScreen(Screen[bool]):
         self.summary = Static()
         self.progress = ProgressBar(total=trip.total_seconds, show_eta=False)
         self.time = Static()
+        self.boss_triggered = False
+        if boss_only:
+            self.boss_this_trip = True
+            self.boss_trigger_elapsed: float | None = 0.0
+        else:
+            mine = trip.mine
+            # First encounter: requirements not yet met → trigger boss at win-criteria threshold
+            if mine and mine.boss and mine not in player.mines_completed and not mine.complete:
+                self.boss_this_trip = True
+                self.boss_trigger_elapsed = None  # Use win-criteria threshold
+            # Repeat encounter: boss already defeated → 25% chance of random re-encounter
+            elif mine and mine.boss and mine in player.mines_completed and random.random() < 0.25:
+                self.boss_this_trip = True
+                self.boss_trigger_elapsed = trip.total_seconds * random.uniform(0.7, 0.95)
+            # Safe farming: requirements met but boss not yet defeated, or no boss
+            else:
+                self.boss_this_trip = False
+                self.boss_trigger_elapsed = 0.0
         self.action = self.random_action
         self.abandoning = False
         self.last_skip_time = 0
@@ -101,7 +122,7 @@ class MineScreen(Screen[bool]):
             self.exit()
         elif isinstance(self.action, MineralAction):
             if settings.mini_games_disabled:
-                content = str(self.content._renderable)  # pylint: disable=protected-access
+                content = str(self.content.content)  # pylint: disable=protected-access
                 if "disabled" not in content:
                     self.content.update(
                         content
@@ -128,10 +149,10 @@ class MineScreen(Screen[bool]):
             if self.check_skip(TICK_LENGTH):
                 trip.seconds_passed(TICK_LENGTH)
                 self.skip()
-        elif isinstance(self.action, VictoryAction):
+        elif isinstance(self.action, (VictoryAction, BossVictoryAction)):
             if self.check_skip(VICTORY_TICK_LENGTH):
                 trip.seconds_passed(TICK_LENGTH)
-                self.action.tick()  # Need to tick here because VictoryAction.next returns itself
+                self.action.tick()  # Need to tick here because next returns itself
                 self.skip()
         elif self.check_skip(MINE_TICK_LENGTH):
             trip.seconds_passed(self.action.duration)
@@ -214,7 +235,24 @@ class MineScreen(Screen[bool]):
 
     @property
     def should_exit(self):
-        return trip.seconds_left <= 0 and not self.action.next or player.army.defeated
+        if player.army.defeated:
+            return True
+        if self.boss_triggered and not trip.boss_defeated:
+            return False
+        return trip.seconds_left <= 0 and not self.action.next
+
+    def _meets_boss_threshold(self) -> bool:
+        assert trip.mine
+        mine = trip.mine
+        if not mine.win_criteria or not mine.player_progress:
+            return False
+        current_minutes = (trip.total_seconds - trip.seconds_left) / 60.0
+        kills_met = mine.player_progress.kills + trip.enemies_defeated >= mine.win_criteria.kills
+        minerals_met = (
+            mine.player_progress.minerals + len(trip.minerals_mined) >= mine.win_criteria.minerals
+        )
+        minutes_met = mine.player_progress.minutes + current_minutes >= mine.win_criteria.minutes
+        return kills_met and minerals_met and minutes_met
 
     @property
     def next_action(self):
@@ -223,6 +261,16 @@ class MineScreen(Screen[bool]):
     @property
     def random_action(self):
         assert trip.mine
+        mine = trip.mine
+        if not self.boss_triggered and mine.boss and self.boss_this_trip:
+            elapsed = trip.total_seconds - trip.seconds_left
+            if self.boss_trigger_elapsed is None:
+                should_trigger = self._meets_boss_threshold()
+            else:
+                should_trigger = elapsed >= self.boss_trigger_elapsed
+            if should_trigger:
+                self.boss_triggered = True
+                return BossIntroAction(mine.boss)
         odds = trip.mine.odds.copy()
         if not player.allies:
             odds = [o for o in odds if o["action"] != "lose_ally"]

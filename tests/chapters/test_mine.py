@@ -3,6 +3,7 @@ from unittest.mock import patch
 from textual.pilot import Pilot
 from textual.widgets import Static
 
+from myning.chapters.mine.screen import MineScreen
 from myning.config import MINES
 from myning.objects.player import Player
 from myning.objects.trip import Trip
@@ -16,9 +17,11 @@ player = Player()
 
 def get_content(app: MyningApp):
     # pylint: disable=protected-access
+    if not isinstance(app.screen, MineScreen):
+        return ""
     return "".join(
-        str(w._renderable)
-        for w in app.query("MineScreen ScrollableContainer Static")
+        str(w.content)
+        for w in app.screen.query("ScrollableContainer Static")
         if isinstance(w, Static)
     )
 
@@ -57,7 +60,7 @@ async def test_mining(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
     # complete trip
     trip.seconds_left = 2
     await pilot.press("enter")
-    assert not app.query("MineScreen")
+    assert not isinstance(app.screen, MineScreen)
     assert chapter.border_title == "Main Menu"
     assert "Your mining trip" in chapter.question.message
     await pilot.press("enter")
@@ -111,7 +114,7 @@ async def test_victory(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
     # increase player stats
     player.level = 30
     # skip until the trip is over
-    while app.query("MineScreen"):
+    while isinstance(app.screen, MineScreen):
         await pilot.press("enter")
 
     assert "Your mining trip" in chapter.question.message
@@ -126,7 +129,7 @@ async def test_defeat(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
     await pilot.press("enter", "enter", "enter")
 
     # skip until the trip is over
-    while app.query("MineScreen"):
+    while isinstance(app.screen, MineScreen):
         await pilot.press("enter")
 
     # chasm is impossible for a level one player

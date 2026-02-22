@@ -11,15 +11,15 @@ from tests.utilities import get_option
 
 
 def get_gold(app: MyningApp):
-    currency = app.query_one("CurrencyWidget", CurrencyWidget).render()
+    currency = app.screen.query_one("CurrencyWidget", CurrencyWidget).render()
     # pylint: disable=protected-access
     gold_text = Text.from_markup(str(currency.columns[2]._cells[0])).plain
     return int(gold_text.replace(",", "").rstrip("g"))
 
 
 async def test_store(app: MyningApp, pilot: Pilot):
-    chapter = app.query_one("ChapterWidget", ChapterWidget)
-    inventory = app.query_one("InventoryWidget", InventoryWidget)
+    chapter = app.screen.query_one("ChapterWidget", ChapterWidget)
+    inventory = app.screen.query_one("InventoryWidget", InventoryWidget)
     starting_gold = get_gold(app)
     await pilot.press("down")
     await pilot.press("enter")

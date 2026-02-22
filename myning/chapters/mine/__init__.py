@@ -35,7 +35,10 @@ def exit_mine():
 
 
 def pick_mine():
-    options = [Option(mine.arr, partial(pick_time, mine)) for mine in player.mines_available] + [
+    options = [
+        Option(mine.arr(mine in player.mines_completed), partial(pick_time, mine))
+        for mine in player.mines_available
+    ] + [
         Option(["", "Unlock New Mine"], pick_unlock_mine),
         Option(["", "Go Back"], exit_mine),
     ]
@@ -48,6 +51,25 @@ def pick_mine():
 
 
 def pick_time(mine: Mine):
+    if mine.boss and mine.complete:
+        if mine in player.mines_completed:
+            explore_msg = "or explore the mine and risk a random encounter."
+        else:
+            explore_msg = "or explore the mine safely."
+        return PickArgs(
+            message=f"You've completed all the challenges in {mine.icon} {mine.name}!\n\n"
+            f"{Icons.BOSS} The boss [bold]{mine.boss.name}[/] awaits. "
+            f"Challenge the boss directly, {explore_msg}",
+            options=[
+                Option(f"{Icons.BOSS} Fight Boss", partial(start_boss_fight, mine)),
+                Option("Enter Mine", partial(pick_regular_time, mine)),
+                Option("Go Back", pick_mine),
+            ],
+        )
+    return pick_regular_time(mine)
+
+
+def pick_regular_time(mine: Mine):
     minutes = [
         int(player.level * 0.5) if player.level > 1 else 1,
         player.level * 1,
@@ -89,6 +111,23 @@ def start_mine(mine: Mine, minutes: int):
     return DynamicArgs(callback=mine_callback)
 
 
+def start_boss_fight(mine: Mine):
+    if player.army.defeated:
+        return PickArgs(
+            message=f"{'Everyone in your army has' if player.allies else 'You have'} no health.\n"
+            "You should probably go visit the healer before heading into the mines.",
+            options=[
+                Option("Could you repeat that please?", partial(start_boss_fight, mine)),
+                Option("Take me there!", healer.enter),
+                Option("Got it, thanks.", exit_mine),
+            ],
+        )
+
+    trip.mine = mine
+    trip.start_trip(5 * 60)
+    return DynamicArgs(callback=boss_fight_callback)
+
+
 def mine_callback(chapter: "ChapterWidget"):
     def screen_callback(abandoned: bool):
         chapter.border_title = "Main Menu"
@@ -99,6 +138,18 @@ def mine_callback(chapter: "ChapterWidget"):
 
     chapter.clear()
     chapter.app.push_screen(MineScreen(), screen_callback)
+
+
+def boss_fight_callback(chapter: "ChapterWidget"):
+    def screen_callback(abandoned: bool):
+        chapter.border_title = "Main Menu"
+        TabTitle.change_tab_status("Done!")
+        TabTitle.change_tab_subactivity("")
+        TabTitle.beep()
+        return chapter.pick(complete_trip(abandoned))
+
+    chapter.clear()
+    chapter.app.push_screen(MineScreen(boss_only=True), screen_callback)
 
 
 def pick_unlock_mine():
@@ -222,8 +273,14 @@ def complete_trip(abandoned: bool):
     progress.minutes += trip.total_seconds / 60.0
     progress.kills += trip.enemies_defeated
     progress.minerals += len(trip.minerals_mined)
+    if trip.boss_defeated:
+        stats.increment_int_stat(IntegerStatKeys.BOSSES_DEFEATED)
+
     if trip.mine.win_criteria:
-        if trip.mine.complete and trip.mine not in player.mines_completed:
+        boss = trip.mine.boss
+        criteria_met = trip.mine.complete
+        boss_ok = boss is None or trip.boss_defeated
+        if criteria_met and boss_ok and trip.mine not in player.mines_completed:
             player.mines_completed.append(trip.mine)
             story_args_list.append(
                 StoryArgs(
@@ -232,7 +289,7 @@ def complete_trip(abandoned: bool):
                     response="Heck yeah!",
                 )
             )
-        elif not trip.mine.complete:
+        elif not criteria_met:
             story_args_list.append(
                 StoryArgs(
                     message=f"You have completed a mining trip in {trip.mine.icon} "

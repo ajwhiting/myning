@@ -37,6 +37,7 @@ class Trip(Object, metaclass=Singleton):
         self.total_seconds = 0
         self.species_discovered = 0
         self.mine: Mine | None = None
+        self.boss_defeated = False
 
     def add_item(self, item: Item):
         if item.type == ItemType.MINERAL:
@@ -93,6 +94,7 @@ class Trip(Object, metaclass=Singleton):
             "mine": self.mine.name if self.mine else None,
             "experience_gained": self.experience_gained,
             "total_seconds": self.total_seconds,
+            "boss_defeated": self.boss_defeated,
         }
 
     file_name = "trip"
@@ -120,6 +122,7 @@ class Trip(Object, metaclass=Singleton):
         summary.seconds_left = dict["seconds_left"]
         summary.experience_gained = dict["experience_gained"]
         summary.total_seconds = dict.get("total_seconds") or 0
+        summary.boss_defeated = dict.get("boss_defeated", False)
         return summary
 
     @property
