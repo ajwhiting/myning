@@ -12,13 +12,10 @@ class Garden(Object, metaclass=Singleton):
     def initialize(cls):
         garden = FileManager.load(Garden, cls.file_name)
         if not garden:
-            garden = cls()
+            garden = cls._create()
         cls._instance = garden
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "garden"
+    file_name = "garden"
 
     def __init__(
         self,
@@ -45,8 +42,8 @@ class Garden(Object, metaclass=Singleton):
     @classmethod
     def from_dict(cls, dict: dict):
         if not dict:
-            return Garden(1)
-        return Garden(
+            return cls._create(1)
+        return cls._create(
             dict["level"],
             dict["water"],
             datetime.strptime(dict["last_collected_water"], "%Y-%m-%dT%H:%M:%S.%f")

@@ -146,7 +146,9 @@ class Character(Object):
 
     @classmethod
     def from_dict(cls, dict: dict):
-        entity = cls(
+        # Use _create if available (Singleton subclasses) to bypass init check
+        create = getattr(cls, "_create", cls)
+        entity = create(
             dict["name"],
             dict["description"],
             dict["level"],
@@ -190,32 +192,29 @@ class Character(Object):
 
         FileManager.save(self)
 
-    @classmethod
-    @property
-    def companion_species(cls):
-        return [
-            CharacterSpecies.DWARF,
-            CharacterSpecies.HUMAN,
-            CharacterSpecies.ELF,
-            CharacterSpecies.ORC,
-            CharacterSpecies.AASIMAR,
-            CharacterSpecies.HALF_ELF,
-            CharacterSpecies.HALF_ORC,
-            CharacterSpecies.HALFLING,
-            CharacterSpecies.KENKU,
-            CharacterSpecies.LIZARDFOLK,
-            CharacterSpecies.KOBOLD,
-            CharacterSpecies.TABAXI,
-            CharacterSpecies.YUAN_TI_PUREBLOOD,
-            CharacterSpecies.HOBGOBLIN,
-            CharacterSpecies.TRITON,
-            CharacterSpecies.GOLIATH,
-            CharacterSpecies.GOBLIN,
-            CharacterSpecies.TIEFLING,
-            CharacterSpecies.BUGBEAR,
-            CharacterSpecies.FIRBOLG,
-            CharacterSpecies.GNOME,
-        ]
+    companion_species = [
+        CharacterSpecies.DWARF,
+        CharacterSpecies.HUMAN,
+        CharacterSpecies.ELF,
+        CharacterSpecies.ORC,
+        CharacterSpecies.AASIMAR,
+        CharacterSpecies.HALF_ELF,
+        CharacterSpecies.HALF_ORC,
+        CharacterSpecies.HALFLING,
+        CharacterSpecies.KENKU,
+        CharacterSpecies.LIZARDFOLK,
+        CharacterSpecies.KOBOLD,
+        CharacterSpecies.TABAXI,
+        CharacterSpecies.YUAN_TI_PUREBLOOD,
+        CharacterSpecies.HOBGOBLIN,
+        CharacterSpecies.TRITON,
+        CharacterSpecies.GOLIATH,
+        CharacterSpecies.GOBLIN,
+        CharacterSpecies.TIEFLING,
+        CharacterSpecies.BUGBEAR,
+        CharacterSpecies.FIRBOLG,
+        CharacterSpecies.GNOME,
+    ]
 
     @property
     def icon(self):
@@ -256,9 +255,8 @@ class Character(Object):
         composite = self.health_mod + self.stats["armor"] + self.stats["damage"]
         return int(composite * 0.2) if composite > 0 else 1
 
-    @classmethod
     @property
-    def army_column_titles(cls):
+    def army_column_titles(self):
         return [
             "",
             "Name",
@@ -286,9 +284,8 @@ class Character(Object):
             "🪦" if self.is_ghost else " ",
         ]
 
-    @classmethod
     @property
-    def pick_column_titles(cls):
+    def pick_column_titles(self):
         return [
             "",
             "Name",

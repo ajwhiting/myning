@@ -9,13 +9,10 @@ class Graveyard(Object, metaclass=Singleton):
     def initialize(cls):
         graveyard = FileManager.load(Graveyard, cls.file_name)
         if not graveyard:
-            graveyard = cls()
+            graveyard = cls._create()
         cls._instance = graveyard
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "graveyard"
+    file_name = "graveyard"
 
     def __init__(
         self,
@@ -28,8 +25,8 @@ class Graveyard(Object, metaclass=Singleton):
     @classmethod
     def from_dict(cls, data) -> "Graveyard":
         if data is None:
-            return Graveyard()
-        return Graveyard(
+            return cls._create()
+        return cls._create(
             data["soul_credits"],
             [Character.from_dict(ally) for ally in data.get("fallen_allies", [])],
         )

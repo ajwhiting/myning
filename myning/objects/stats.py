@@ -37,13 +37,10 @@ class Stats(Object, metaclass=Singleton):
     def initialize(cls):
         stats = FileManager.load(Stats, cls.file_name)
         if not stats:
-            stats = cls()
+            stats = cls._create()
         cls._instance = stats
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "stats"
+    file_name = "stats"
 
     def __init__(
         self,
@@ -56,8 +53,8 @@ class Stats(Object, metaclass=Singleton):
     @classmethod
     def from_dict(cls, data: dict) -> "Stats":
         if data is None:
-            return Stats()
-        return Stats(data["integer_stats"], data.get("float_stats", {}))
+            return cls._create()
+        return cls._create(data["integer_stats"], data.get("float_stats", {}))
 
     @property
     def all_stats(self) -> dict[str, int | float]:
@@ -89,4 +86,4 @@ class Stats(Object, metaclass=Singleton):
         self.integer_stats[key.value] = value
 
     def increment_float_stat(self, key: FloatStatKeys, increment_by: float):
-        self.integer_stats[key.value] = self.integer_stats.get(key.value, 0) + increment_by
+        self.float_stats[key.value] = self.float_stats.get(key.value, 0) + increment_by

@@ -17,7 +17,7 @@ class Game(Object, metaclass=Singleton):
 
     @classmethod
     def initialize(cls):
-        game = FileManager.load(Game, "game") or cls()
+        game = FileManager.load(Game, "game") or cls._create()
         cls._instance = game
 
         # Fill mines with progress
@@ -25,10 +25,7 @@ class Game(Object, metaclass=Singleton):
         for name, mine in MINES.items():
             mine.player_progress = player.get_mine_progress(name)
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "game"
+    file_name = "game"
 
     def to_dict(self):
         return {
@@ -37,6 +34,6 @@ class Game(Object, metaclass=Singleton):
 
     @classmethod
     def from_dict(cls, dict: dict):
-        game = cls()
+        game = cls._create()
         game._state = dict["state"]
         return game

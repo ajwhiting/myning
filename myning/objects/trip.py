@@ -19,7 +19,7 @@ class Trip(Object, metaclass=Singleton):
     def initialize(cls):
         trip = FileManager.load(Trip, cls.file_name)
         if not trip:
-            trip = cls()
+            trip = cls._create()
         cls._instance = trip
 
     def __init__(self) -> None:
@@ -95,23 +95,18 @@ class Trip(Object, metaclass=Singleton):
             "total_seconds": self.total_seconds,
         }
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "trip"
+    file_name = "trip"
 
     @classmethod
     def from_dict(cls, dict: dict) -> "Trip":
-        summary = Trip()
+        summary = cls._create()
         summary.minerals_mined = []
 
         for item_id in dict["minerals_mined"]:
             item = FileManager.load(Item, item_id, Subfolders.ITEMS)
             if not item:
-                print("Could not find mineral", item_id)
                 continue
-            else:
-                summary.minerals_mined.append(item)
+            summary.minerals_mined.append(item)
 
         summary.items_found = [
             FileManager.load(Item, item_id, Subfolders.ITEMS) for item_id in dict["items_found"]

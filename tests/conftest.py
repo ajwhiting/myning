@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
+from myning.config import load_config
 from myning.objects.game import Game, GameState
 from myning.objects.inventory import Inventory
 from myning.objects.player import Player
@@ -11,7 +12,8 @@ from myning.objects.trip import Trip
 
 # pylint: disable=redefined-outer-name
 
-# Initialize objects and set up values before app tests
+# Load game data and initialize singletons before app tests
+load_config()
 Player.initialize("MockPlayer")
 player = Player()
 player.reset()

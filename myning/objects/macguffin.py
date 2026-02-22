@@ -8,13 +8,10 @@ class Macguffin(Object, metaclass=Singleton):
     def initialize(cls):
         macguffin = FileManager.load(Macguffin, cls.file_name)
         if not macguffin:
-            macguffin = cls()
+            macguffin = cls._create()
         cls._instance = macguffin
 
-    @classmethod
-    @property
-    def file_name(cls):
-        return "macguffin"
+    file_name = "macguffin"
 
     def __init__(
         self,
@@ -33,8 +30,8 @@ class Macguffin(Object, metaclass=Singleton):
     @classmethod
     def from_dict(cls, data) -> "Macguffin":
         if data is None:
-            return Macguffin()
-        return Macguffin(
+            return cls._create()
+        return cls._create(
             data["exp_boost"],
             data["store_boost"],  # Mineral boost, old key
             data["research_boost"],
