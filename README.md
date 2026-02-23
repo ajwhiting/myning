@@ -7,51 +7,21 @@ Mine for ore, battle enemies, manage your garden, upgrade your gear, and so much
 
 ## Prerequisites
 
-### MacOS Setup
+- Python 3.13+
+- [uv](https://docs.astral.sh/uv/) (dependency and environment manager)
 
-Install Homebrew:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-Reload your environment (or just restart your terminal):
+Install `uv` if you don't have it:
 
 ```bash
-exec zsh
-```
-
-Add `brew` to your path:
-
-```bash
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
-```
-
-Install pyenv and virtualenv:
-
-```bash
-brew install pyenv pyenv-virtualenv
-```
-
-Initialize pyenv in your shell:
-
-```bash
-echo 'eval "$(pyenv init -)"' >> ~/.zshrc
-echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
-```
-
-Reload your environment (or just restart your terminal):
-
-```bash
-exec zsh
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ## Play the Game
 
-Set up the environment:
+Install dependencies:
 
 ```bash
-make venv
+make sync
 ```
 
 Play the game:
@@ -62,29 +32,38 @@ make play
 
 ## Contributing
 
+### Setup
+
+Install all dependencies (production + dev):
+
+```bash
+make sync
+```
+
 ### Textual User Interface (TUI)
 
-When developing a full-screen terminal application, the python debugger will not work. Instead, use
-the textual debug console by running `textual console -x SYSTEM -x EVENT -x DEBUG -x INFO` in a
-separate terminal and use `make dev` to run the app. You can then use `print` statements in the
-code, and they will be displayed in the console window.
+When developing a full-screen terminal application, the Python debugger will not work. Instead, use
+the Textual debug console by running `make dev`, which launches both the game and a Textual console
+side by side. You can use `print` statements in the code and they will be displayed in the console.
 
 - [Textual documentation](https://textual.textualize.io) (TUI framework)
 - [Textual devtools documentation](https://textual.textualize.io/guide/devtools/#console)
 - [Rich documentation](https://rich.readthedocs.io/en/stable/) (library for styling and displaying rich text)
 
-### Formatting and organizing imports
+### Formatting and Linting
 
-Format the code:
+This project uses [Ruff](https://docs.astral.sh/ruff/) for both formatting and linting.
+
+Check for issues:
 
 ```bash
-black .
+make lint
 ```
 
-Organize imports:
+Auto-fix and format:
 
 ```bash
-isort .
+make format
 ```
 
 ### Tests
@@ -95,10 +74,10 @@ Run tests:
 make test
 ```
 
-It may be helpful to visually debug TUI tests by running pytests with the `--headed` option:
+It may be helpful to visually debug TUI tests by running pytest with the `--headed` option:
 
 ```bash
-pytest --headed
+uv run pytest --headed
 ```
 
 View test coverage:
