@@ -47,15 +47,21 @@ class Stats(Object, metaclass=Singleton):
         self,
         integer_stats: dict[str, int] | None = None,
         float_stats: dict[str, float] | None = None,
+        defeated_bosses: list[str] | None = None,
     ):
         self.integer_stats = integer_stats or {}
         self.float_stats = float_stats or {}
+        self.defeated_bosses: list[str] = defeated_bosses or []
 
     @classmethod
     def from_dict(cls, data: dict) -> "Stats":
         if data is None:
             return cls._create()
-        return cls._create(data["integer_stats"], data.get("float_stats", {}))
+        return cls._create(
+            data["integer_stats"],
+            data.get("float_stats", {}),
+            data.get("defeated_bosses", []),
+        )
 
     @property
     def all_stats(self) -> dict[str, int | float]:
@@ -78,7 +84,15 @@ class Stats(Object, metaclass=Singleton):
         return table
 
     def to_dict(self) -> dict:
-        return {"integer_stats": self.integer_stats, "float_stats": self.float_stats}
+        return {
+            "integer_stats": self.integer_stats,
+            "float_stats": self.float_stats,
+            "defeated_bosses": self.defeated_bosses,
+        }
+
+    def record_boss_defeat(self, boss_name: str):
+        if boss_name not in self.defeated_bosses:
+            self.defeated_bosses.append(boss_name)
 
     def increment_int_stat(self, key: IntegerStatKeys, increment_by: int = 1):
         self.integer_stats[key.value] = int(self.integer_stats.get(key.value, 0) + increment_by)

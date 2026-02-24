@@ -37,6 +37,7 @@ Hole in the ground:
     intro_text: "A massive goblin emerges from the depths, brandishing a crude mace..."
     victory_text: "The Goblin Leader crumbles! The mine is yours!"
     reward_multiplier: 3
+    description: "Grix rose to prominence through cunning and brute force, uniting the goblin clans of the upper shafts under his crooked banner. Armed with a mace fashioned from broken mining tools, he taxed every spelunker foolish enough to dig without his permission. Miners speak of him with grudging respect — he was only a goblin, but he ran a tight operation."
 
 Small pit:
   type: regular
@@ -77,6 +78,7 @@ Small pit:
     intro_text: "A bloated rat the size of a dog waddles toward you, wearing a crooked crown of gnawed bones and clutching a shard of tin like a scepter..."
     victory_text: "The Rat Baron lets out a final squeal and crumples. Long live the new ruler of the pit — that's you."
     reward_multiplier: 3
+    description: "Squealer earned his title after deposing three previous rulers of the Small Pit through what historians describe as 'aggressive negotiation.' His crown, assembled from the bones of those rulers, serves as both trophy and warning. He commands absolute loyalty from his rodent subjects, rewarding compliance with cheese scraps and punishing dissent with a sharp tin scepter to the snout."
 
 Trench:
   type: regular
@@ -118,6 +120,7 @@ Trench:
     intro_text: "The walls shudder as something enormous hauls itself from the sludge below. Bogmaw stands before you, towering and reeking, one eye milky white and the other full of malice..."
     victory_text: "Bogmaw crashes down with a wet thud, shaking the trench walls. The muck claims him quickly. The trench is yours."
     reward_multiplier: 4
+    description: "Bogmaw has lived in the Trench sludge for so long that the muck has become part of him — literally. Researchers theorize he is at least two centuries old, sustained by a diet of whatever falls into the trench and an apparent inability to die of natural causes. His milky eye, lost in a battle with a cave-in decades ago, has since grown back wrong. Locals leave offerings at the trench rim to keep him dormant."
 
 Tin mine:
   type: resource
@@ -185,6 +188,7 @@ Large pit:
     intro_text: "The ground erupts. A segmented behemoth the length of a cart, bristling with serrated bone spines, coils above your party like a question it intends to answer violently..."
     victory_text: "Thornback shudders, each segment flickering out like a dying torch. The pit goes still. Whatever it guarded is yours now."
     reward_multiplier: 4
+    description: "Thornback belongs to a species of subterranean arthropod thought to have gone extinct during the last major geological upheaval. It did not. Each of its bone-spine segments houses a semi-independent nervous system, making it extraordinarily difficult to kill — severing one section merely irritates the rest. It appears to guard the deepest ore deposits instinctively, as if the minerals themselves are a part of its territory."
 
 Training Ground:
   type: combat
@@ -253,6 +257,7 @@ Cave:
     intro_text: "A throne of crumbled stone sits at the cave's heart, and upon it — a figure in blackened armor, crown askew, eye sockets burning with pale fire. The Hollow King has been waiting a very long time for someone worth fighting..."
     victory_text: "The Hollow King shatters into a cascade of rust and bone. His long vigil ends. The crown rolls to your feet."
     reward_multiplier: 5
+    description: "Historical records describe a king who delved too deep into his own mines, seeking power in the dark below his kingdom. He found something. His kingdom fell overnight — no siege, no invasion, simply gone — and the king descended into the cave and never returned. The pale fire in his eye sockets is believed to be a remnant of whatever he found. He has been waiting ever since, armored in the rust of centuries, for a challenger worthy of ending his vigil."
 
 Coal mine:
   type: resource
@@ -321,6 +326,7 @@ Cavern:
     intro_text: "The cavern walls pulse with violet light as a figure of living crystal descends from the ceiling on threads of solidified magic. 'More intruders,' Stagmata croons, her voice resonating off every facet. 'How lovely...'"
     victory_text: "Stagmata's crystalline form fractures and implodes in a shower of violet shards, each one humming a dying note. Beautiful, and deadly no more."
     reward_multiplier: 5
+    description: "Stagmata was once a court enchantress who discovered that cavern crystals could be used to store and amplify magical energy indefinitely. Her experiments grew consuming. Over decades of isolation, she replaced her own flesh piece by piece with living crystal, each substitution extending her life and her power at the cost of her humanity. The cavern she inhabits has become an extension of her body — to enter it is to be inside her."
 
 Battle Ground:
   type: combat
@@ -389,6 +395,7 @@ Death Valley:
     intro_text: "The earth splits and a wyrm the color of scorched iron rises from the fissure, trailing smoke and cinders. Ashfang's molten gaze fixes on your party with ancient, hungry contempt..."
     victory_text: "Ashfang collapses with a final wheeze of smoke and steam. The valley cools around you. You breathe in ash and victory."
     reward_multiplier: 5
+    description: "Scorchwyrms are deep-earth predators that feed on thermal vents and mineral deposits rich in iron. Ashfang is the largest recorded specimen — a creature of scorched iron scales and perpetual internal combustion. The Death Valley earned its name not from the conventional hazards of mining, but from the centuries Ashfang spent converting the valley floor into a personal hunting ground. Its body temperature is estimated to exceed 800 degrees."
 
 Cave System:
   type: regular
@@ -431,6 +438,7 @@ Cave System:
     intro_text: "Every tunnel in this cave system is connected by a single, vast web. You were already in it before you noticed. At the center, Webweaver Prime watches you with a hundred glistening eyes, perfectly, terrifyingly still..."
     victory_text: "Webweaver Prime curls inward, her countless legs folding like a closing fist. The web goes slack. For the first time, the cave system is quiet."
     reward_multiplier: 6
+    description: "Webweaver Prime is not the largest of her species but is almost certainly the oldest and most intelligent. Her web spans the entire cave system — estimated at several miles of silk threads — and functions as both a sensory network and a communication system with her offspring. She does not hunt by instinct; she plans. Explorers who have escaped her web report that she seemed to let them go, as if testing their capabilities for a later engagement."
 
 Gold mine:
   type: resource
@@ -500,6 +508,7 @@ Meteor Crater:
     intro_text: "Something survived the impact. At the crater's glowing heart, a pulsing mass of alien crystal and fused metal rises — older than anything in this world, and very much alive..."
     victory_text: "The Impact Remnant fractures into inert shards of cosmic material, their light guttering out one by one. Whatever it was, wherever it came from, it's gone now."
     reward_multiplier: 6
+    description: "The Impact Remnant predates the crater by an indeterminate amount of time — it did not arrive with the meteorite, it arrived as the meteorite. Analysis of recovered shards suggests materials not found anywhere else on this world. It appears to be a singular organism, or possibly a collective intelligence compressed into a crystalline matrix during interstellar travel. It is unknown whether it chose this world as a destination or simply stopped here."
 
 Canyon:
   type: regular
@@ -543,6 +552,7 @@ Canyon:
     intro_text: "A thunderclap, no clouds. On the canyon rim above, Stormclaw spreads storm-grey wings wide enough to blot the sky, the wind from each beat threatening to send your party over the edge..."
     victory_text: "Stormclaw plummets from the rim in a cascade of feathers and rolling thunder, shaking the canyon walls on impact. You stand at the edge, breathing hard, looking down. The canyon belongs to you."
     reward_multiplier: 7
+    description: "Canyon Drakes are rare apex predators that evolved alongside the geological formations they inhabit, their wingspans calibrated precisely for the thermal drafts that rise between canyon walls. Stormclaw is distinguished by storm-grey plumage that generates static charge with each wingbeat, capable of producing localized lightning strikes. She has claimed this canyon as sovereign territory for at least sixty years, and the bones of those who challenged her claim line the canyon floor."
 
 Chasm:
   type: regular
@@ -586,6 +596,7 @@ Chasm:
     intro_text: "You hear it before you see it: a sound like a thousand whispers compressed into one. The Void Shepherd rises from the chasm's bottomless dark, trailing shapes that should not be, herding something you cannot look at directly..."
     victory_text: "The Void Shepherd unravels like smoke in a gale. The things it was herding retreat into the dark. You try very hard not to wonder what they were."
     reward_multiplier: 8
+    description: "The Void Shepherd is not fully present in the physical world — it exists partially in a space adjacent to reality, which is why the things it herds cannot be looked at directly. It appears to have no malicious intent toward the things it guides; its aggression toward miners is territorial. What it is herding, and toward what destination, is unknown. Several explorers who spent extended time near the Chasm have reported hearing whispers in a language they do not know, and finding themselves fluent in it upon waking."
 
 Gorge:
   type: regular
@@ -629,3 +640,4 @@ Gorge:
     intro_text: "The gorge itself seems to wake. Stone formations you assumed were natural landmarks grind and shift, revealing the face of something that has slept since before memory. Krathanos opens its eyes — and they are the color of magma. It does not seem surprised to see you."
     victory_text: "Krathanos crashes down with the finality of a mountain collapsing. The gorge shakes for a full minute. You are still standing. Somehow. The silence that follows is the loudest thing you have ever heard."
     reward_multiplier: 10
+    description: "Krathanos is older than the gorge. Geological surveys indicate the gorge itself was formed around it over millennia of slow geological movement — the stone formations believed to be natural landmarks are its limbs. It is not known whether Krathanos is a living organism, a geological phenomenon that developed consciousness, or something else entirely. It has not moved in recorded history. The magma in its eyes is believed to be connected to a deep thermal vent network spanning hundreds of miles."

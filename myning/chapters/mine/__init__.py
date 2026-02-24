@@ -271,6 +271,8 @@ def complete_trip(abandoned: bool):
     progress.minerals += len(trip.minerals_mined)
     if trip.boss_defeated:
         stats.increment_int_stat(IntegerStatKeys.BOSSES_DEFEATED)
+        if trip.mine.boss:
+            stats.record_boss_defeat(trip.mine.boss.name)
 
     if trip.mine.win_criteria:
         boss = trip.mine.boss

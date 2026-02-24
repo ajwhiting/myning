@@ -4,11 +4,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import lru_cache
 
-from chafa import Canvas, CanvasConfig, PixelType
-from PIL import Image
 from rich.console import RenderableType
 from rich.table import Table
-from rich.text import Text
 from textual.widget import Widget
 
 from myning.chapters.mine.mining_minigame import MiningMinigame, MiningScore
@@ -22,6 +19,7 @@ from myning.objects.player import Player
 from myning.objects.settings import Settings
 from myning.objects.stats import IntegerStatKeys, Stats
 from myning.objects.trip import Trip
+from myning.utilities.boss_art import render_boss_art
 from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
 from myning.utilities.generators import (
@@ -378,31 +376,10 @@ class LoseAllyAction(Action):
         return self.message
 
 
-@lru_cache(maxsize=4)
-def _render_boss_art(boss_config: BossConfig) -> Text:
-    config = CanvasConfig()
-    image = Image.open(f"./{boss_config.image}").convert("RGB")
-    config.width = 80
-    config.height = 35
-    config.calc_canvas_geometry(image.width, image.height, 11 / 24)
-    bands = len(image.getbands())
-    pixels = image.tobytes()
-    canvas = Canvas(config)
-    canvas.draw_all_pixels(
-        PixelType.CHAFA_PIXEL_RGB8,
-        pixels,  # type: ignore
-        image.width,
-        image.height,
-        image.width * bands,
-    )
-    output = canvas.print()
-    return Text.from_ansi(output.decode())
-
-
 class BossIntroAction(Action):
     def __init__(self, boss_config: BossConfig):
         self.boss_config = boss_config
-        self._art = _render_boss_art(boss_config)
+        self._art = render_boss_art(boss_config)
         super().__init__(7)
 
     @property
@@ -424,7 +401,7 @@ class BossIntroAction(Action):
 class BossCombatAction(CombatAction):
     def __init__(self, boss_config: BossConfig, *, enemies: Army | None = None, round: int = 1):
         self.boss_config = boss_config
-        self._art = _render_boss_art(boss_config)
+        self._art = render_boss_art(boss_config)
         if enemies is None:
             boss_char = generate_character(
                 [boss_config.level, boss_config.level],

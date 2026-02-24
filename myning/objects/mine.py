@@ -23,6 +23,7 @@ class BossConfig:
     intro_text: str
     victory_text: str
     reward_multiplier: int
+    description: str = ""
 
 
 class MineType(str, Enum):
@@ -96,6 +97,7 @@ class Mine(Object):
                 intro_text=boss_data["intro_text"],
                 victory_text=boss_data["victory_text"],
                 reward_multiplier=boss_data["reward_multiplier"],
+                description=boss_data.get("description", ""),
             )
         return mine
 
@@ -127,6 +129,7 @@ class Mine(Object):
                 "intro_text": self.boss.intro_text,
                 "victory_text": self.boss.victory_text,
                 "reward_multiplier": self.boss.reward_multiplier,
+                "description": self.boss.description,
             }
             if self.boss
             else None,

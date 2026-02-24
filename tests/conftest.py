@@ -69,12 +69,16 @@ def mock_save():
         yield
 
 
+stats = Stats()
+
+
 @pytest.fixture(autouse=True)
 def reset_objects():
     player.reset()
     inventory._items = {}  # pylint: disable=protected-access
     trip.clear()
     settings.mini_games_disabled = False
+    stats.defeated_bosses = []
 
 
 @pytest.fixture

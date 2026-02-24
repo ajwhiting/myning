@@ -8,7 +8,7 @@ from rich.text import Text
 from textual.widgets import ProgressBar
 
 from myning import api
-from myning.chapters import AsyncArgs, Option, PickArgs, main_menu
+from myning.chapters import AsyncArgs, Option, PickArgs, bestiary, main_menu
 from myning.objects.garden import Garden
 from myning.objects.inventory import Inventory
 from myning.objects.macguffin import Macguffin
@@ -33,6 +33,7 @@ def enter():
     return PickArgs(
         message="Your Stats\n",
         options=[
+            Option(f"{Icons.BOSS} Boss Bestiary", lambda: bestiary.enter(enter)),
             Option("Sync Stats", lambda: AsyncArgs(callback=sync)),
             Option("View Highscores", lambda: AsyncArgs(callback=view_players)),
             Option("Go Back", main_menu.enter),
