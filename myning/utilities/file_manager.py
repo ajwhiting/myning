@@ -79,14 +79,14 @@ class FileManager:
                 json.dump(item.to_dict(), f, indent=2)
 
     @staticmethod
-    def load(type: Type[T], file_name=None, subfolder="") -> T | None:
+    def load(cls: Type[T], file_name=None, subfolder="") -> T | None:
         key = f"{subfolder}/{file_name}" if subfolder else file_name
 
         if _db_exists():
             with _connect() as conn:
                 row = conn.execute("SELECT data FROM save_data WHERE key=?", (key,)).fetchone()
             if row is not None:
-                return type.from_dict(json.loads(row[0]))
+                return cls.from_dict(json.loads(row[0]))
             # Key not in DB yet (e.g. fresh object after migration)
             return None
 
@@ -98,9 +98,9 @@ class FileManager:
         if not Path(json_path).is_file():
             return None
         if os.path.getsize(json_path) == 0:
-            return type()
+            return cls()
         with open(json_path) as f:
-            return type.from_dict(json.load(f))
+            return cls.from_dict(json.load(f))
 
     @staticmethod
     def delete(item: Object):

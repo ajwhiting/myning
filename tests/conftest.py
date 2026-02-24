@@ -25,7 +25,7 @@ player.reset()
 
 Game.initialize()
 game = Game()
-game._state = GameState.READY  # pylint: disable=protected-access
+game.state = GameState.READY
 
 Garden.initialize()
 Graveyard.initialize()
@@ -40,7 +40,7 @@ Stats.initialize()
 Trip.initialize()
 
 inventory = Inventory()
-inventory._items = {}  # pylint: disable=protected-access
+inventory.clear()
 
 trip = Trip()
 trip.clear()
@@ -75,7 +75,7 @@ stats = Stats()
 @pytest.fixture(autouse=True)
 def reset_objects():
     player.reset()
-    inventory._items = {}  # pylint: disable=protected-access
+    inventory.clear()
     trip.clear()
     settings.mini_games_disabled = False
     stats.defeated_bosses = []
@@ -103,4 +103,4 @@ def pilot(app_and_pilot):
 
 @pytest.fixture
 def chapter(app: MyningApp):
-    yield app.screen.query_one("ChapterWidget", ChapterWidget)
+    yield app.screen.query_one(ChapterWidget)

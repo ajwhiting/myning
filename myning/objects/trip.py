@@ -2,7 +2,7 @@ from collections import Counter
 
 from rich.table import Table
 
-from myning.config import MINES
+from myning.config import LOST_RATIO, MINES
 from myning.objects.character import Character
 from myning.objects.item import Item, ItemType
 from myning.objects.mine import Mine
@@ -10,8 +10,6 @@ from myning.objects.object import Object
 from myning.objects.singleton import Singleton
 from myning.utilities.file_manager import FileManager, Subfolders
 from myning.utilities.ui import Colors, Icons
-
-LOST_RATIO = 2
 
 
 class Trip(Object, metaclass=Singleton):

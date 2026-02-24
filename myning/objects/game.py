@@ -1,8 +1,6 @@
 from enum import Enum
 
-from myning.config import MINES
 from myning.objects.object import Object
-from myning.objects.player import Player
 from myning.objects.singleton import Singleton
 from myning.utilities.file_manager import FileManager
 
@@ -20,12 +18,15 @@ class Game(Object, metaclass=Singleton):
         game = FileManager.load(Game, "game") or cls._create()
         cls._instance = game
 
-        # Fill mines with progress
-        player = Player()
-        for name, mine in MINES.items():
-            mine.player_progress = player.get_mine_progress(name)
-
     file_name = "game"
+
+    @property
+    def state(self) -> GameState:
+        return self._state
+
+    @state.setter
+    def state(self, value: GameState):
+        self._state = value
 
     def to_dict(self):
         return {

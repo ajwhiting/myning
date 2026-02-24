@@ -69,7 +69,12 @@ class MineScreen(Screen[bool]):
         else:
             mine = trip.mine
             # Boss encounter: requirements not yet met → trigger boss at win-criteria threshold
-            if mine and mine.boss and mine not in player.mines_completed and not mine.complete:
+            if (
+                mine
+                and mine.boss
+                and mine not in player.mines_completed
+                and not mine.is_complete(player.get_mine_progress(mine.name))
+            ):
                 self.boss_this_trip = True
                 self.boss_trigger_elapsed = None  # Use win-criteria threshold
             # No boss once already defeated
@@ -242,14 +247,13 @@ class MineScreen(Screen[bool]):
     def _meets_boss_threshold(self) -> bool:
         assert trip.mine
         mine = trip.mine
-        if not mine.win_criteria or not mine.player_progress:
+        if not mine.win_criteria:
             return False
+        progress = player.get_mine_progress(mine.name)
         current_minutes = (trip.total_seconds - trip.seconds_left) / 60.0
-        kills_met = mine.player_progress.kills + trip.enemies_defeated >= mine.win_criteria.kills
-        minerals_met = (
-            mine.player_progress.minerals + len(trip.minerals_mined) >= mine.win_criteria.minerals
-        )
-        minutes_met = mine.player_progress.minutes + current_minutes >= mine.win_criteria.minutes
+        kills_met = progress.kills + trip.enemies_defeated >= mine.win_criteria.kills
+        minerals_met = progress.minerals + len(trip.minerals_mined) >= mine.win_criteria.minerals
+        minutes_met = progress.minutes + current_minutes >= mine.win_criteria.minutes
         return kills_met and minerals_met and minutes_met
 
     @property

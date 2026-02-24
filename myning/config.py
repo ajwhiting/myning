@@ -39,6 +39,7 @@ for _id, _upgrade in _load_yaml("upgrades.yaml").items():
     _upgrade["id"] = _id
     UPGRADES[_id] = Upgrade.from_dict(_upgrade)
 
+LOST_RATIO = CONFIG["lost_ratio"]
 MARKDOWN_RATIO = CONFIG["markdown_ratio"]
 XP_COST = CONFIG["xp_cost"]
 

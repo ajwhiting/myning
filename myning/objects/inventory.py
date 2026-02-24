@@ -39,6 +39,12 @@ class Inventory(Object, metaclass=Singleton):
             if item.type in self._items and item in self._items[item.type]:
                 self._items[item.type].remove(item)
 
+    def clear(self):
+        self._items = {}
+
+    def items_by_type(self) -> list[list[Item]]:
+        return list(self._items.values())
+
     @overload
     def get_slot(self, slot: Literal[ItemType.PLANT]) -> list[Plant]: ...
 
