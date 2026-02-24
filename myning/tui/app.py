@@ -111,3 +111,11 @@ class MyningApp(App):
 
     def on_mount(self):
         self.push_screen(MyningScreen())
+
+    def action_quit(self):
+        from myning.chapters.mine.screen import MineScreen
+
+        if isinstance(self.screen, MineScreen):
+            self.screen.action_abandon()
+        else:
+            self.exit()

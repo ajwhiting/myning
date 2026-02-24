@@ -111,7 +111,9 @@ class Trip(Object, metaclass=Singleton):
             summary.minerals_mined.append(item)
 
         summary.items_found = [
-            FileManager.load(Item, item_id, Subfolders.ITEMS) for item_id in dict["items_found"]
+            item
+            for item_id in dict["items_found"]
+            if (item := FileManager.load(Item, item_id, Subfolders.ITEMS)) is not None
         ]
         summary.allies_gained = [Character.from_dict(ally) for ally in dict["allies_gained"]]
         if "allies_lost" in dict:

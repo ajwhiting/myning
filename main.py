@@ -49,20 +49,31 @@ def main():
     # Load tui after importing and initializing objects to allow global references
     from myning.tui.app import MyningApp  # pylint: disable=import-outside-toplevel
 
-    MyningApp().run()
-    FileManager.multi_save(
-        Game(),
-        Garden(),
-        Graveyard(),
-        Inventory(),
-        Macguffin(),
-        Player(),
-        ResearchFacility(),
-        Settings(),
-        Stats(),
-        Trip(),
-    )
-    print("Game saved. Thank you for playing Myning!")
+    _time_travel = False
+    try:
+        MyningApp().run()
+    except SystemExit as exc:
+        # Exit code 123 = time travel: reset_game() already ran and Singleton.reset() was called,
+        # so singletons are gone. Don't attempt to save — just re-raise.
+        if exc.code == 123:
+            _time_travel = True
+            raise
+        # Any other SystemExit (shouldn't normally reach here): fall through to save.
+    finally:
+        if not _time_travel:
+            FileManager.multi_save(
+                Game(),
+                Garden(),
+                Graveyard(),
+                Inventory(),
+                Macguffin(),
+                Player(),
+                ResearchFacility(),
+                Settings(),
+                Stats(),
+                Trip(),
+            )
+            print("Game saved. Thank you for playing Myning!")
 
 
 if __name__ == "__main__":

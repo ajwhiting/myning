@@ -51,15 +51,11 @@ def pick_mine():
 
 
 def pick_time(mine: Mine):
-    if mine.boss and mine.complete:
-        if mine in player.mines_completed:
-            explore_msg = "or explore the mine and risk a random encounter."
-        else:
-            explore_msg = "or explore the mine safely."
+    if mine.boss and mine.complete and mine not in player.mines_completed:
         return PickArgs(
             message=f"You've completed all the challenges in {mine.icon} {mine.name}!\n\n"
             f"{Icons.BOSS} The boss [bold]{mine.boss.name}[/] awaits. "
-            f"Challenge the boss directly, {explore_msg}",
+            f"Challenge the boss directly, or explore the mine safely.",
             options=[
                 Option(f"{Icons.BOSS} Fight Boss", partial(start_boss_fight, mine)),
                 Option("Enter Mine", partial(pick_regular_time, mine)),

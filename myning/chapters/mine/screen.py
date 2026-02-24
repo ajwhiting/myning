@@ -68,15 +68,11 @@ class MineScreen(Screen[bool]):
             self.boss_trigger_elapsed: float | None = 0.0
         else:
             mine = trip.mine
-            # First encounter: requirements not yet met → trigger boss at win-criteria threshold
+            # Boss encounter: requirements not yet met → trigger boss at win-criteria threshold
             if mine and mine.boss and mine not in player.mines_completed and not mine.complete:
                 self.boss_this_trip = True
                 self.boss_trigger_elapsed = None  # Use win-criteria threshold
-            # Repeat encounter: boss already defeated → 25% chance of random re-encounter
-            elif mine and mine.boss and mine in player.mines_completed and random.random() < 0.25:
-                self.boss_this_trip = True
-                self.boss_trigger_elapsed = trip.total_seconds * random.uniform(0.7, 0.95)
-            # Safe farming: requirements met but boss not yet defeated, or no boss
+            # No boss once already defeated
             else:
                 self.boss_this_trip = False
                 self.boss_trigger_elapsed = 0.0
@@ -239,6 +235,8 @@ class MineScreen(Screen[bool]):
             return True
         if self.boss_triggered and not trip.boss_defeated:
             return False
+        if self.boss_triggered and trip.boss_defeated:
+            return not self.action.next
         return trip.seconds_left <= 0 and not self.action.next
 
     def _meets_boss_threshold(self) -> bool:

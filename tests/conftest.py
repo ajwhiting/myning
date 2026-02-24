@@ -33,6 +33,9 @@ Inventory.initialize()
 Macguffin.initialize()
 ResearchFacility.initialize()
 Settings.initialize()
+settings = Settings()
+settings.mini_games_disabled = False
+
 Stats.initialize()
 Trip.initialize()
 
@@ -71,6 +74,7 @@ def reset_objects():
     player.reset()
     inventory._items = {}  # pylint: disable=protected-access
     trip.clear()
+    settings.mini_games_disabled = False
 
 
 @pytest.fixture

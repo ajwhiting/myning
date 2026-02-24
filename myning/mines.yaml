@@ -66,6 +66,17 @@ Small pit:
     kills: 50
     minutes: 45
     minerals: 120
+  boss:
+    name: Squealer the Rat Baron
+    image: images/rat_baron.png
+    level: 8
+    health_multiplier: 1.0
+    max_items: 3
+    max_item_level: 6
+    item_scale: 2.5
+    intro_text: "A bloated rat the size of a dog waddles toward you, wearing a crooked crown of gnawed bones and clutching a shard of tin like a scepter..."
+    victory_text: "The Rat Baron lets out a final squeal and crumples. Long live the new ruler of the pit — that's you."
+    reward_multiplier: 3
 
 Trench:
   type: regular
@@ -96,6 +107,17 @@ Trench:
     minutes: 120
     minerals: 200
   companion_rarity: 1 # First place we can get companions. All are human
+  boss:
+    name: Bogmaw the Trench Troll
+    image: images/trench_troll.png
+    level: 15
+    health_multiplier: 1.2
+    max_items: 4
+    max_item_level: 12
+    item_scale: 2.5
+    intro_text: "The walls shudder as something enormous hauls itself from the sludge below. Bogmaw stands before you, towering and reeking, one eye milky white and the other full of malice..."
+    victory_text: "Bogmaw crashes down with a wet thud, shaking the trench walls. The muck claims him quickly. The trench is yours."
+    reward_multiplier: 4
 
 Tin mine:
   type: resource
@@ -152,6 +174,17 @@ Large pit:
     minutes: 200
     minerals: 380
   companion_rarity: 1 # Still just humans
+  boss:
+    name: Thornback the Burrower
+    image: images/burrower.png
+    level: 22
+    health_multiplier: 1.5
+    max_items: 4
+    max_item_level: 15
+    item_scale: 3.0
+    intro_text: "The ground erupts. A segmented behemoth the length of a cart, bristling with serrated bone spines, coils above your party like a question it intends to answer violently..."
+    victory_text: "Thornback shudders, each segment flickering out like a dying torch. The pit goes still. Whatever it guarded is yours now."
+    reward_multiplier: 4
 
 Training Ground:
   type: combat
@@ -209,6 +242,17 @@ Cave:
     minutes: 400
     minerals: 1200
   companion_rarity: 2
+  boss:
+    name: The Hollow King
+    image: images/hollow_king.png
+    level: 25
+    health_multiplier: 1.8
+    max_items: 5
+    max_item_level: 18
+    item_scale: 3.0
+    intro_text: "A throne of crumbled stone sits at the cave's heart, and upon it — a figure in blackened armor, crown askew, eye sockets burning with pale fire. The Hollow King has been waiting a very long time for someone worth fighting..."
+    victory_text: "The Hollow King shatters into a cascade of rust and bone. His long vigil ends. The crown rolls to your feet."
+    reward_multiplier: 5
 
 Coal mine:
   type: resource
@@ -266,6 +310,17 @@ Cavern:
     minutes: 1000
     minerals: 2100
   companion_rarity: 3
+  boss:
+    name: Stagmata the Crystal Witch
+    image: images/crystal_witch.png
+    level: 32
+    health_multiplier: 2.0
+    max_items: 5
+    max_item_level: 22
+    item_scale: 3.5
+    intro_text: "The cavern walls pulse with violet light as a figure of living crystal descends from the ceiling on threads of solidified magic. 'More intruders,' Stagmata croons, her voice resonating off every facet. 'How lovely...'"
+    victory_text: "Stagmata's crystalline form fractures and implodes in a shower of violet shards, each one humming a dying note. Beautiful, and deadly no more."
+    reward_multiplier: 5
 
 Battle Ground:
   type: combat
@@ -323,6 +378,17 @@ Death Valley:
     minutes: 800
     minerals: 1900
   companion_rarity: 2
+  boss:
+    name: Ashfang the Scorchwyrm
+    image: images/scorchwyrm.png
+    level: 28
+    health_multiplier: 2.2
+    max_items: 5
+    max_item_level: 21
+    item_scale: 3.5
+    intro_text: "The earth splits and a wyrm the color of scorched iron rises from the fissure, trailing smoke and cinders. Ashfang's molten gaze fixes on your party with ancient, hungry contempt..."
+    victory_text: "Ashfang collapses with a final wheeze of smoke and steam. The valley cools around you. You breathe in ash and victory."
+    reward_multiplier: 5
 
 Cave System:
   type: regular
@@ -354,6 +420,17 @@ Cave System:
     minutes: 1000
     minerals: 2800
   companion_rarity: 4
+  boss:
+    name: Webweaver Prime
+    image: images/webweaver.png
+    level: 38
+    health_multiplier: 2.5
+    max_items: 6
+    max_item_level: 28
+    item_scale: 4.0
+    intro_text: "Every tunnel in this cave system is connected by a single, vast web. You were already in it before you noticed. At the center, Webweaver Prime watches you with a hundred glistening eyes, perfectly, terrifyingly still..."
+    victory_text: "Webweaver Prime curls inward, her countless legs folding like a closing fist. The web goes slack. For the first time, the cave system is quiet."
+    reward_multiplier: 6
 
 Gold mine:
   type: resource
@@ -412,6 +489,17 @@ Meteor Crater:
     minutes: 1400
     minerals: 3600
   companion_rarity: 4
+  boss:
+    name: The Impact Remnant
+    image: images/impact_remnant.png
+    level: 45
+    health_multiplier: 2.8
+    max_items: 6
+    max_item_level: 32
+    item_scale: 4.0
+    intro_text: "Something survived the impact. At the crater's glowing heart, a pulsing mass of alien crystal and fused metal rises — older than anything in this world, and very much alive..."
+    victory_text: "The Impact Remnant fractures into inert shards of cosmic material, their light guttering out one by one. Whatever it was, wherever it came from, it's gone now."
+    reward_multiplier: 6
 
 Canyon:
   type: regular
@@ -444,6 +532,17 @@ Canyon:
     minutes: 1600
     minerals: 6200
   companion_rarity: 5
+  boss:
+    name: Stormclaw the Canyon Drake
+    image: images/canyon_drake.png
+    level: 52
+    health_multiplier: 3.0
+    max_items: 6
+    max_item_level: 38
+    item_scale: 4.5
+    intro_text: "A thunderclap, no clouds. On the canyon rim above, Stormclaw spreads storm-grey wings wide enough to blot the sky, the wind from each beat threatening to send your party over the edge..."
+    victory_text: "Stormclaw plummets from the rim in a cascade of feathers and rolling thunder, shaking the canyon walls on impact. You stand at the edge, breathing hard, looking down. The canyon belongs to you."
+    reward_multiplier: 7
 
 Chasm:
   type: regular
@@ -476,6 +575,17 @@ Chasm:
     minutes: 2100
     minerals: 8000
   companion_rarity: 6
+  boss:
+    name: The Void Shepherd
+    image: images/void_shepherd.png
+    level: 80
+    health_multiplier: 3.5
+    max_items: 6
+    max_item_level: 45
+    item_scale: 5.0
+    intro_text: "You hear it before you see it: a sound like a thousand whispers compressed into one. The Void Shepherd rises from the chasm's bottomless dark, trailing shapes that should not be, herding something you cannot look at directly..."
+    victory_text: "The Void Shepherd unravels like smoke in a gale. The things it was herding retreat into the dark. You try very hard not to wonder what they were."
+    reward_multiplier: 8
 
 Gorge:
   type: regular
@@ -508,3 +618,14 @@ Gorge:
     minutes: 2500
     minerals: 15000
   companion_rarity: 7
+  boss:
+    name: Krathanos the Primordial
+    image: images/krathanos.png
+    level: 95
+    health_multiplier: 4.0
+    max_items: 6
+    max_item_level: 55
+    item_scale: 5.0
+    intro_text: "The gorge itself seems to wake. Stone formations you assumed were natural landmarks grind and shift, revealing the face of something that has slept since before memory. Krathanos opens its eyes — and they are the color of magma. It does not seem surprised to see you."
+    victory_text: "Krathanos crashes down with the finality of a mountain collapsing. The gorge shakes for a full minute. You are still standing. Somehow. The silence that follows is the loudest thing you have ever heard."
+    reward_multiplier: 10
