@@ -1,3 +1,4 @@
+from textual.binding import Binding
 from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.validation import Number
@@ -9,14 +10,7 @@ from myning.utilities.formatter import Formatter
 class IntInput(Input):
     def validate_value(self, value: str):
         value = value.strip()
-        if (
-            value
-            and value[-1] == "q"
-            and (screen := self.app.query("IntInputScreen")[0])
-            and isinstance(screen, IntInputScreen)
-        ):
-            screen.action_cancel()
-        elif value:
+        if value:
             try:
                 int(value)
             except ValueError:
@@ -25,7 +19,10 @@ class IntInput(Input):
 
 
 class IntInputScreen(ModalScreen[int | None]):
-    BINDINGS = [("escape", "cancel", "cancel")]
+    BINDINGS = [
+        ("escape", "cancel", "cancel"),
+        Binding("q", "cancel", "cancel", priority=True),
+    ]
 
     def __init__(
         self,
@@ -64,7 +61,7 @@ class IntInputScreen(ModalScreen[int | None]):
         if event.validation_result and event.validation_result.is_valid:
             self.dismiss(int(event.value))
         else:
-            self.query_one("Vertical").mount(self.error, before=-1)
+            self.query_one(Vertical).mount(self.error, before=-1)
 
     def action_cancel(self):
         self.dismiss(None)

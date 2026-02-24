@@ -55,12 +55,11 @@ class MyningScreen(Screen):
         if key and (binding := focused._bindings.keys.get(key)):  # pylint: disable=protected-access
             await focused.run_action(binding.action)
 
-    async def action_toggle_sidebar(self):
-        if sidebar := self.query("SideBar"):
-            sidebar.remove()
-        else:
-            await self.query_one("Body").mount(SideBar())
-            self.query_one("ChapterWidget", ChapterWidget).update_dashboard()
+    def action_toggle_sidebar(self):
+        sidebar = self.query_one(SideBar)
+        sidebar.display = not sidebar.display
+        if sidebar.display:
+            self.query_one(ChapterWidget).update_dashboard()
 
     def action_help(self) -> None:
         """Action to display the help dialog."""

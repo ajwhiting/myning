@@ -27,7 +27,7 @@ jrod = Character("J-Rod", "a friendly minor miner")
 
 
 def is_complete():
-    return game._state != GameState.TUTORIAL  # pylint: disable=protected-access
+    return game.state != GameState.TUTORIAL
 
 
 def narrate(messages: list[str], handler: PickHandler):
@@ -166,6 +166,6 @@ def learn_bindings():
 
 
 def exit_tutorial():
-    game._state = GameState.READY  # pylint: disable=protected-access
+    game.state = GameState.READY
     FileManager.multi_save(game, player, inventory, *inventory.items)
     return main_menu.enter()

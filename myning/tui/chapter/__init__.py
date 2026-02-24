@@ -46,14 +46,13 @@ class ChapterKeyHandler(Protocol):
     async def handle_chapter_key(self, key: str) -> None: ...
 
 
-HOTKEY_ALIASES = {
+_BASE_HOTKEY_ALIASES: dict[str, str] = {
     "j": "down",
     "k": "up",
     "ctrl_d": "pagedown",
     "ctrl_u": "pageup",
 }
-BASE_RESERVED_HOTKEYS = {"j", "k", "q"}
-RESERVED_HOTKEYS = set(BASE_RESERVED_HOTKEYS)
+_BASE_RESERVED_HOTKEYS: frozenset[str] = frozenset({"j", "k", "q"})
 
 
 def _find_key_handler(widget: "ChapterWidget") -> ChapterKeyHandler | None:
@@ -64,21 +63,6 @@ def _find_key_handler(widget: "ChapterWidget") -> ChapterKeyHandler | None:
     return None
 
 
-def _sync_hotkey_overrides(widget: "ChapterWidget"):
-    """Add/remove hotkey aliases based on whether a ChapterKeyHandler is mounted."""
-    handler = _find_key_handler(widget)
-    # Reset to base state
-    for key in list(HOTKEY_ALIASES):
-        if key not in ("j", "k", "ctrl_d", "ctrl_u"):
-            del HOTKEY_ALIASES[key]
-    RESERVED_HOTKEYS.clear()
-    RESERVED_HOTKEYS.update(BASE_RESERVED_HOTKEYS)
-
-    if handler:
-        HOTKEY_ALIASES.update(handler.extra_hotkey_aliases)
-        RESERVED_HOTKEYS.update(handler.extra_hotkey_aliases)
-
-
 class ChapterWidget(ScrollableContainer):
     can_focus = True
 
@@ -87,6 +71,8 @@ class ChapterWidget(ScrollableContainer):
         self.option_table = OptionTable()
         self.handlers: list[Handler] = []
         self.hotkeys: dict[str, int] = {}
+        self.hotkey_aliases: dict[str, str] = dict(_BASE_HOTKEY_ALIASES)
+        self.reserved_hotkeys: set[str] = set(_BASE_RESERVED_HOTKEYS)
         super().__init__()
 
     def compose(self):
@@ -108,7 +94,7 @@ class ChapterWidget(ScrollableContainer):
 
     async def on_key(self, event: events.Key):
         event.stop()
-        key = HOTKEY_ALIASES.get(event.name, event.name)
+        key = self.hotkey_aliases.get(event.name, event.name)
         if key == "tab":
             self.app.action_focus_next()
         elif key == "shift_tab":
@@ -139,10 +125,18 @@ class ChapterWidget(ScrollableContainer):
         await self.select(row.cursor_row)
 
     def update_dashboard(self):
-        if self.screen.query("SideBar"):
-            self.screen.query_one("ArmyWidget", ArmyWidget).update()
-            self.screen.query_one("CurrencyWidget", CurrencyWidget).refresh()
-            self.screen.query_one("InventoryWidget", InventoryWidget).update()
+        self.screen.query_one(ArmyWidget).update()
+        self.screen.query_one(CurrencyWidget).refresh()
+        self.screen.query_one(InventoryWidget).update()
+
+    def _sync_hotkey_overrides(self):
+        """Add/remove hotkey aliases based on whether a ChapterKeyHandler is mounted."""
+        handler = _find_key_handler(self)
+        self.hotkey_aliases = dict(_BASE_HOTKEY_ALIASES)
+        self.reserved_hotkeys = set(_BASE_RESERVED_HOTKEYS)
+        if handler:
+            self.hotkey_aliases.update(handler.extra_hotkey_aliases)
+            self.reserved_hotkeys.update(handler.extra_hotkey_aliases)
 
     def pick(self, args: PickArgs):
         self.update_dashboard()
@@ -151,8 +145,8 @@ class ChapterWidget(ScrollableContainer):
             TabTitle.change_tab_status(title)
         self.question.message = args.message
         self.question.subtitle = args.subtitle or ""
-        _sync_hotkey_overrides(self)
-        options, hotkeys = get_labels_and_hotkeys(args.options)
+        self._sync_hotkey_overrides()
+        options, hotkeys = get_labels_and_hotkeys(args.options, self.reserved_hotkeys)
         self.option_table.clear(columns=True)
         if options:
             column_count = max(len(option) for option in options)
@@ -192,7 +186,9 @@ class ChapterWidget(ScrollableContainer):
         self.pick(PickArgs(message="", options=[]))
 
 
-def get_labels_and_hotkeys(options: list[Option]) -> tuple[list[list[str | Text]], dict[str, int]]:
+def get_labels_and_hotkeys(
+    options: list[Option], reserved_hotkeys: set[str]
+) -> tuple[list[list[str | Text]], dict[str, int]]:
     hotkeys: dict[str, int] = {}
     labels: list[list[str | Text]] = []
     # The last Option is always assumed to be back or continue, so it defaults to no hotkey
@@ -219,7 +215,7 @@ def get_labels_and_hotkeys(options: list[Option]) -> tuple[list[list[str | Text]
                 break
 
         if text_option and text_option_index is not None:
-            hotkey, hotkey_index = get_hotkey(text_option.plain, hotkeys)
+            hotkey, hotkey_index = get_hotkey(text_option.plain, hotkeys, reserved_hotkeys)
             if hotkey and hotkey_index is not None:
                 hotkeys[hotkey] = option_index
                 text_option.stylize("underline", hotkey_index, hotkey_index + 1)
@@ -229,9 +225,11 @@ def get_labels_and_hotkeys(options: list[Option]) -> tuple[list[list[str | Text]
     return labels, hotkeys
 
 
-def get_hotkey(label: str, hotkeys: dict[str, int]) -> tuple[None, None] | tuple[str, int]:
+def get_hotkey(
+    label: str, hotkeys: dict[str, int], reserved_hotkeys: set[str]
+) -> tuple[None, None] | tuple[str, int]:
     for hotkey_index, char in enumerate(label):
         hotkey = char.lower()
-        if hotkey in string.ascii_lowercase and hotkey not in RESERVED_HOTKEYS | set(hotkeys):
+        if hotkey in string.ascii_lowercase and hotkey not in reserved_hotkeys | set(hotkeys):
             return hotkey, hotkey_index
     return None, None

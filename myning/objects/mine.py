@@ -47,7 +47,6 @@ class Mine(Object):
         self.character_levels = []
         self.odds = []
         self.win_criteria: MineStats = None
-        self.player_progress: MineStats = None
         self.resource = None
         self.companion_rarity = 0
         self.boss: BossConfig | None = None
@@ -153,41 +152,38 @@ class Mine(Object):
                 return odd["chance"]
         return 0
 
-    @property
-    def complete(self) -> bool:
+    def is_complete(self, progress: MineStats) -> bool:
         if self.win_criteria is None:
             return False
         return (
-            self.player_progress.minerals >= self.win_criteria.minerals
-            and self.player_progress.kills >= self.win_criteria.kills
-            and self.player_progress.minutes >= self.win_criteria.minutes
+            progress.minerals >= self.win_criteria.minerals
+            and progress.kills >= self.win_criteria.kills
+            and progress.minutes >= self.win_criteria.minutes
         )
 
-    @property
-    def progress_bar(self):
+    def make_progress_bar(self, progress: MineStats):
         current = (
-            min(self.player_progress.minerals, self.win_criteria.minerals)
-            + min(self.player_progress.kills, self.win_criteria.kills)
-            + min(self.player_progress.minutes, self.win_criteria.minutes)
+            min(progress.minerals, self.win_criteria.minerals)
+            + min(progress.kills, self.win_criteria.kills)
+            + min(progress.minutes, self.win_criteria.minutes)
         )
         return ProgressBar(total=self.win_criteria.total_items, completed=current, width=20)
 
-    @property
-    def progress(self):
+    def progress_table(self, progress: MineStats):
         table = Table.grid(padding=(0, 1, 0, 0))
         if self.win_criteria:
-            table.add_row("Progress:", self.progress_bar)
+            table.add_row("Progress:", self.make_progress_bar(progress))
             table.add_row(
                 "Minerals:",
-                remaining_str(self.player_progress.minerals, self.win_criteria.minerals),
+                remaining_str(progress.minerals, self.win_criteria.minerals),
             )
             table.add_row(
                 "Kills:",
-                remaining_str(self.player_progress.kills, self.win_criteria.kills),
+                remaining_str(progress.kills, self.win_criteria.kills),
             )
             table.add_row(
                 "Minutes Survived:",
-                remaining_str(int(self.player_progress.minutes), int(self.win_criteria.minutes)),
+                remaining_str(int(progress.minutes), int(self.win_criteria.minutes)),
             )
         return table
 
@@ -212,13 +208,13 @@ class Mine(Object):
         closest_key_floor = max(c for c in chances if c < odds)
         return f"{Icons.DEATH} {chances[closest_key_floor]}"
 
-    def arr(self, cleared: bool = False):
+    def arr(self, cleared: bool = False, progress: MineStats | None = None):
         arr = [self.icon, self.name, self.death_chance_str]
         if self.win_criteria:
             if cleared:
                 arr.append("✨ cleared ✨")
-            else:
-                arr.append(self.progress_bar)
+            elif progress is not None:
+                arr.append(self.make_progress_bar(progress))
         return arr
 
     def get_unlock_arr(self, player_level: int):

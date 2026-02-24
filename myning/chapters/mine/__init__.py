@@ -36,7 +36,10 @@ def exit_mine():
 
 def pick_mine():
     options = [
-        Option(mine.arr(mine in player.mines_completed), partial(pick_time, mine))
+        Option(
+            mine.arr(mine in player.mines_completed, player.get_mine_progress(mine.name)),
+            partial(pick_time, mine),
+        )
         for mine in player.mines_available
     ] + [
         Option(["", "Unlock New Mine"], pick_unlock_mine),
@@ -51,7 +54,11 @@ def pick_mine():
 
 
 def pick_time(mine: Mine):
-    if mine.boss and mine.complete and mine not in player.mines_completed:
+    if (
+        mine.boss
+        and mine.is_complete(player.get_mine_progress(mine.name))
+        and mine not in player.mines_completed
+    ):
         return PickArgs(
             message=f"You've completed all the challenges in {mine.icon} {mine.name}!\n\n"
             f"{Icons.BOSS} The boss [bold]{mine.boss.name}[/] awaits. "
@@ -77,7 +84,7 @@ def pick_regular_time(mine: Mine):
         Option(f"{m} minutes", partial(start_mine, mine, m), enable_hotkeys=False) for m in minutes
     ]
     options.append(Option("Go Back", pick_mine))
-    subtitle = mine.progress
+    subtitle = mine.progress_table(player.get_mine_progress(mine.name))
     subtitle.add_row("Risk of Demise:", mine.death_chance_str)
     if mine.companion_rarity:
         subtitle.add_row("Discoverable:", "".join(unlock_species_emojies(available_species(mine))))
@@ -265,7 +272,7 @@ def complete_trip(abandoned: bool):
         increase = RESEARCH["speed_up_time"].player_value + 100
         trip.total_seconds = int(trip.total_seconds * increase / 100)
 
-    progress = trip.mine.player_progress
+    progress = player.get_mine_progress(trip.mine.name)
     progress.minutes += trip.total_seconds / 60.0
     progress.kills += trip.enemies_defeated
     progress.minerals += len(trip.minerals_mined)
@@ -276,7 +283,7 @@ def complete_trip(abandoned: bool):
 
     if trip.mine.win_criteria:
         boss = trip.mine.boss
-        criteria_met = trip.mine.complete
+        criteria_met = trip.mine.is_complete(player.get_mine_progress(trip.mine.name))
         boss_ok = boss is None or trip.boss_defeated
         if criteria_met and boss_ok and trip.mine not in player.mines_completed:
             player.mines_completed.append(trip.mine)
@@ -292,7 +299,7 @@ def complete_trip(abandoned: bool):
                 StoryArgs(
                     message=f"You have completed a mining trip in {trip.mine.icon} "
                     f"[dodger_blue1]{trip.mine.name}[/].\n",
-                    subtitle=trip.mine.progress,
+                    subtitle=trip.mine.progress_table(player.get_mine_progress(trip.mine.name)),
                     response="Thanks for the update",
                 )
             )

@@ -8,7 +8,7 @@ from textual.screen import Screen
 from myning.chapters.mine import pick_time
 from myning.chapters.mine.screen import MineScreen
 from myning.config import MINES
-from myning.objects.mine import MineStats
+from myning.objects.mine_stats import MineStats
 from myning.objects.player import Player
 from myning.objects.trip import Trip
 
@@ -32,9 +32,9 @@ def _make_screen() -> MineScreen:
 
 
 def _complete_mine():
-    """Set player_progress so mine.complete is True."""
+    """Set player progress so mine.is_complete() returns True."""
     wc = BOSS_MINE.win_criteria
-    BOSS_MINE.player_progress = MineStats(
+    player.mine_progressions[BOSS_MINE.name] = MineStats(
         minutes=wc.minutes,
         kills=wc.kills,
         minerals=wc.minerals,
@@ -44,16 +44,16 @@ def _complete_mine():
 @pytest.fixture(autouse=True)
 def setup_boss_mine():
     """Set up a boss mine trip and restore mine state after each test."""
-    BOSS_MINE.player_progress = MineStats(minutes=0, kills=0, minerals=0)
+    player.mine_progressions[BOSS_MINE.name] = MineStats(minutes=0, kills=0, minerals=0)
     trip.mine = BOSS_MINE
     trip.start_trip(5 * 60)
     yield
-    BOSS_MINE.player_progress = None
+    del player.mine_progressions[BOSS_MINE.name]
 
 
 def test_first_encounter_triggers_boss_at_threshold():
     """On the first encounter (requirements not met), boss triggers at win-criteria threshold."""
-    assert not BOSS_MINE.complete
+    assert not BOSS_MINE.is_complete(player.get_mine_progress(BOSS_MINE.name))
     assert BOSS_MINE not in player.mines_completed
 
     screen = _make_screen()
@@ -65,7 +65,7 @@ def test_first_encounter_triggers_boss_at_threshold():
 def test_safe_farming_when_complete_but_boss_undefeated():
     """Enter Mine is safe when criteria are met but boss hasn't been defeated yet (Bug 1 regression)."""
     _complete_mine()
-    assert BOSS_MINE.complete
+    assert BOSS_MINE.is_complete(player.get_mine_progress(BOSS_MINE.name))
     assert BOSS_MINE not in player.mines_completed
 
     screen = _make_screen()
@@ -73,21 +73,8 @@ def test_safe_farming_when_complete_but_boss_undefeated():
     assert screen.boss_this_trip is False
 
 
-@patch("myning.chapters.mine.screen.random.random", return_value=0.1)  # 0.1 < 0.25 → triggers
-def test_repeat_encounter_triggers_after_boss_defeated(_mock):
-    """After boss is defeated, a 25% random re-encounter can fire."""
-    _complete_mine()
-    player.mines_completed.append(BOSS_MINE)
-
-    screen = _make_screen()
-
-    assert screen.boss_this_trip is True
-    assert screen.boss_trigger_elapsed is not None  # time-based trigger, not threshold
-
-
-@patch("myning.chapters.mine.screen.random.random", return_value=0.9)  # 0.9 > 0.25 → no trigger
-def test_repeat_encounter_no_trigger_when_roll_fails(_mock):
-    """After boss is defeated, 75% of the time there is no re-encounter."""
+def test_no_boss_encounter_after_boss_defeated():
+    """After boss is defeated and mine is completed, there is no boss encounter."""
     _complete_mine()
     player.mines_completed.append(BOSS_MINE)
 
@@ -107,12 +94,12 @@ def test_pick_time_message_says_safely_when_boss_undefeated():
     assert "random encounter" not in result.message
 
 
-def test_pick_time_message_says_random_encounter_when_boss_defeated():
-    """pick_time shows 'random encounter' when the boss has already been beaten."""
+def test_pick_time_shows_regular_selection_when_boss_defeated():
+    """pick_time shows regular time selection when the boss has already been beaten."""
     _complete_mine()
     player.mines_completed.append(BOSS_MINE)
 
     result = pick_time(BOSS_MINE)
 
-    assert "random encounter" in result.message
+    assert "How long" in result.message
     assert "safely" not in result.message
