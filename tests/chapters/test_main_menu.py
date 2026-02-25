@@ -22,7 +22,7 @@ def test_main_menu(app: MyningApp, chapter: ChapterWidget):
         "Research Facility",
         "Time Machine",
         "Telescope",
-        "Journal",
+        "Compendium",
         "Stats",
         "Settings",
         "Exit",

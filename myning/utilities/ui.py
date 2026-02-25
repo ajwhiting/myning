@@ -8,6 +8,7 @@ class Icons(StrEnum):
     ARMORY = "🛡"
     BARRACKS = "⛺️"
     BLACKSMITH = "🔨"
+    COMPENDIUM = "📖"
     CRIT = "🩸"
     DAMAGE = "⚔️ "
     DEATH = "💀"
