@@ -1,4 +1,5 @@
 from . import (
+    bestiary_backfill,
     blacksmith_upgrade,
     garden_transfer,
     generate_ids,
@@ -24,4 +25,5 @@ MIGRATIONS = {
     9: graveyard_transfer,
     10: inventory_transfer,
     11: sqlite_migration,
+    12: bestiary_backfill,
 }

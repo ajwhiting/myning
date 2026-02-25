@@ -73,8 +73,9 @@ def test_safe_farming_when_complete_but_boss_undefeated():
     assert screen.boss_this_trip is False
 
 
-def test_no_boss_encounter_after_boss_defeated():
-    """After boss is defeated and mine is completed, there is no boss encounter."""
+@patch("myning.chapters.mine.screen.random.random", return_value=0.9)  # 0.9 > 0.25 → no trigger
+def test_repeat_encounter_no_trigger_when_roll_fails(_mock):
+    """After boss is defeated, 75% of the time there is no re-encounter."""
     _complete_mine()
     player.mines_completed.append(BOSS_MINE)
 

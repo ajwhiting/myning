@@ -157,7 +157,16 @@ class ChapterWidget(ScrollableContainer):
                 self.option_table.add_columns(*args.column_titles)
             else:
                 self.option_table.show_header = False
-                self.option_table.add_columns(*(str(i) for i in range(column_count)))
+                for col_idx in range(column_count):
+                    max_width = 0
+                    for option in options:
+                        if col_idx < len(option):
+                            cell = option[col_idx]
+                            if isinstance(cell, str):
+                                max_width = max(max_width, len(cell))
+                            elif isinstance(cell, Text):
+                                max_width = max(max_width, cell.cell_len)
+                    self.option_table.add_column(str(col_idx), width=max(max_width, 1))
             self.option_table.add_rows(options)
         self.hotkeys = hotkeys
         self.handlers = [opt.handler for opt in args.options]
