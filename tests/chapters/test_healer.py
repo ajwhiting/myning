@@ -18,6 +18,7 @@ async def test_healer(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
     await pilot.press("enter")
     assert isinstance(app.screen, HealScreen)
 
-    await pilot.press("enter")
+    while isinstance(app.screen, HealScreen):
+        await pilot.press("enter")
     assert player.health == player.max_health
     assert chapter.question.message == "Everyone is healthy."
