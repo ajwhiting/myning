@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Callable
 
 from rich.table import Table
 
@@ -13,30 +14,30 @@ player = Player()
 facility = ResearchFacility()
 
 
-def enter():
-    species_list = SPECIES.values()
+def enter(back_handler: Callable = None):
+    species_list = [s for s in SPECIES.values() if s.name != "Alien"]
+    discovered_count = sum(1 for s in species_list if s in player.discovered_species)
     options = [
         Option(
             [species.icon, species.name]
             if species in player.discovered_species
-            else [Icons.LOCKED, Colors.LOCKED("*" * len(species.name))],
-            partial(show, species),
+            else [Icons.LOCKED, Colors.LOCKED("?" * len(species.name))],
+            partial(show, species, back_handler),
         )
         for species in species_list
-        if species.name != "Alien"
     ]
-    options.append(Option(["", "Go Back"], main_menu.enter))
+    options.append(Option(["", "Go Back"], back_handler or main_menu.enter))
     return PickArgs(
-        message="Select a Species to learn about them.",
+        message=f"Species Journal ({discovered_count}/{len(species_list)})\n",
         options=options,
     )
 
 
-def show(species: Species):
+def show(species: Species, back_handler: Callable = None):
     if species not in player.discovered_species:
         return PickArgs(
             message="You have not discovered this species yet.",
-            options=[Option("Go Back", enter)],
+            options=[Option("Go Back", partial(enter, back_handler))],
         )
 
     exact_stats = (
@@ -53,6 +54,6 @@ def show(species: Species):
     table.add_row("Alignment", species.alignment)
     return PickArgs(
         message=table,
-        options=[Option("Go Back", enter)],
+        options=[Option("Go Back", partial(enter, back_handler))],
         subtitle="\n" + species.description,
     )
