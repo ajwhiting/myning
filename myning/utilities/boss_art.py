@@ -11,8 +11,8 @@ from myning.objects.mine import BossConfig
 def render_boss_art(boss_config: BossConfig) -> Text:
     config = CanvasConfig()
     image = Image.open(f"./{boss_config.image}").convert("RGB")
-    config.width = 80
-    config.height = 35
+    config.width = 120
+    config.height = 55
     config.calc_canvas_geometry(image.width, image.height, 11 / 24)
     bands = len(image.getbands())
     pixels = image.tobytes()
