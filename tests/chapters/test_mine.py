@@ -53,13 +53,15 @@ async def test_mining(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
     mineral = trip.minerals_mined[0]
     assert mineral.name in get_content(app)
 
-    # tick after getting mineral goes back to mining
-    await pilot.pause(4)
+    # tick after getting mineral goes back to mining (ItemsAction has duration=5)
+    await pilot.pause(6)
     assert "Mining..." in get_content(app)
 
-    # complete trip
+    # complete trip: set low time, skip current action to push seconds_left negative,
+    # then wait for the auto-tick (fires every TICK_LENGTH=1s) to detect should_exit and dismiss
     trip.seconds_left = 2
     await pilot.press("enter")
+    await pilot.pause(1.5)
     assert not isinstance(app.screen, MineScreen)
     assert chapter.border_title == "Main Menu"
     assert "Your mining trip" in chapter.question.message
