@@ -163,7 +163,7 @@ class ChapterWidget(ScrollableContainer):
                         if col_idx < len(option):
                             cell = option[col_idx]
                             if isinstance(cell, str):
-                                max_width = max(max_width, len(cell))
+                                max_width = max(max_width, Text.from_markup(cell).cell_len)
                             elif isinstance(cell, Text):
                                 max_width = max(max_width, cell.cell_len)
                     self.option_table.add_column(str(col_idx), width=max(max_width, 1))
@@ -201,36 +201,35 @@ def get_labels_and_hotkeys(
     hotkeys: dict[str, int] = {}
     labels: list[list[str | Text]] = []
     # The last Option is always assumed to be back or continue, so it defaults to no hotkey
-    if options:
-        options[-1].enable_hotkeys = False
+    last_index = len(options) - 1
     for option_index, option in enumerate(options):
-        if not isinstance(option.label, list):
-            option.label = [option.label]
+        label: list[str | Text] = option.label if isinstance(option.label, list) else [option.label]
 
-        if not option.enable_hotkeys:
-            labels.append(option.label)
+        if not option.enable_hotkeys or option_index == last_index:
+            labels.append(list(label))
             continue
 
         text_option_index = None
         text_option = None
-        for index, item in enumerate(option.label):
+        for index, item in enumerate(label):
             if isinstance(item, str) and any(c in string.ascii_letters for c in item):
                 text_option = Text.from_markup(item)
                 text_option_index = index
                 break
             if isinstance(item, Text):
-                text_option = item
+                text_option = item.copy()
                 text_option_index = index
                 break
 
+        new_label = list(label)
         if text_option and text_option_index is not None:
             hotkey, hotkey_index = get_hotkey(text_option.plain, hotkeys, reserved_hotkeys)
             if hotkey and hotkey_index is not None:
                 hotkeys[hotkey] = option_index
                 text_option.stylize("underline", hotkey_index, hotkey_index + 1)
-                option.label[text_option_index] = text_option
+                new_label[text_option_index] = text_option
 
-        labels.append(option.label)
+        labels.append(new_label)
     return labels, hotkeys
 
 
