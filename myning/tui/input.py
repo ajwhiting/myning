@@ -8,14 +8,8 @@ from myning.utilities.formatter import Formatter
 
 
 class IntInput(Input):
-    def validate_value(self, value: str):
-        value = value.strip()
-        if value:
-            try:
-                int(value)
-            except ValueError:
-                return self.value
-        return value
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, restrict=r"\d*", **kwargs)
 
 
 class IntInputScreen(ModalScreen[int | None]):
