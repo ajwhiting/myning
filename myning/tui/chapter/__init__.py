@@ -26,7 +26,6 @@ from myning.tui.chapter.question import Question
 from myning.tui.currency import CurrencyWidget
 from myning.tui.inventory import InventoryWidget
 from myning.utilities.tab_title import TabTitle
-from myning.utilities.ui import Icons
 
 player = Player()
 trip = Trip()
@@ -73,6 +72,7 @@ class ChapterWidget(ScrollableContainer):
         self.hotkeys: dict[str, int] = {}
         self.hotkey_aliases: dict[str, str] = dict(_BASE_HOTKEY_ALIASES)
         self.reserved_hotkeys: set[str] = set(_BASE_RESERVED_HOTKEYS)
+        self.disable_escape: bool = False
         super().__init__()
 
     def compose(self):
@@ -100,10 +100,8 @@ class ChapterWidget(ScrollableContainer):
         elif key == "shift_tab":
             self.app.action_focus_previous()
         elif key in ("escape", "q"):
-            if not self.option_table.rows or self.option_table.get_row_at(
-                self.option_table.row_count - 1
-            ) == [Icons.EXIT, "Exit"]:
-                return  # Prevent exiting with escape or q in main menu
+            if self.disable_escape:
+                return
             await self.select(-1)
         elif key in self.hotkeys:
             await self.select(self.hotkeys[key])
@@ -115,6 +113,8 @@ class ChapterWidget(ScrollableContainer):
             self.option_table.scroll_page_right()
         elif handler := _find_key_handler(self):
             await handler.handle_chapter_key(key)
+        # NOTE: _bindings is a private Textual API (tested against Textual 8.0.0).
+        # If this breaks after a Textual upgrade, check BindingsMap for the new public API.
         elif bindings := self.option_table._bindings.key_to_bindings.get(  # pylint: disable=protected-access
             key
         ):
@@ -140,6 +140,7 @@ class ChapterWidget(ScrollableContainer):
 
     def pick(self, args: PickArgs):
         self.update_dashboard()
+        self.disable_escape = args.disable_escape
         if title := args.border_title:
             self.border_title = title
             TabTitle.change_tab_status(title)

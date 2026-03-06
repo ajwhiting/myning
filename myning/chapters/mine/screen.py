@@ -62,6 +62,7 @@ class MineScreen(Screen[bool]):
         self.summary = Static()
         self.progress = ProgressBar(total=trip.total_seconds, show_eta=False)
         self.time = Static()
+        self.mounted_content_widget: Widget | None = None
         self.boss_triggered = False
         if boss_only:
             self.boss_this_trip = True
@@ -183,9 +184,16 @@ class MineScreen(Screen[bool]):
         if not trip.mine:
             return
         if isinstance(self.action.content, Widget):
-            self.content_container.mount(self.action.content, before=0)
+            if self.mounted_content_widget is not self.action.content:
+                if self.mounted_content_widget is not None:
+                    self.mounted_content_widget.remove()
+                self.mounted_content_widget = self.action.content
+                self.content_container.mount(self.action.content, before=0)
             self.content.update("")
         else:
+            if self.mounted_content_widget is not None:
+                self.mounted_content_widget.remove()
+                self.mounted_content_widget = None
             self.content.update(self.action.content)
         if isinstance(self.action, CombatAction):
             self.sidebar.display = False

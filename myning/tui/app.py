@@ -52,6 +52,8 @@ class MyningScreen(Screen):
             "upper_g": "end",
         }
         key = aliases.get(event.name)
+        # NOTE: _bindings is a private Textual API (tested against Textual 8.0.0).
+        # If this breaks after a Textual upgrade, check BindingsMap for the new public API.
         if key and (binding := focused._bindings.keys.get(key)):  # pylint: disable=protected-access
             await focused.run_action(binding.action)
 

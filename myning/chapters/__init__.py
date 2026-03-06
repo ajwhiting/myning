@@ -15,6 +15,7 @@ class PickArgs:
     subtitle: Optional[RenderableType] = None
     border_title: Optional[str] = None
     column_titles: Optional[list[str | Text]] = None
+    disable_escape: bool = False
 
 
 @dataclass

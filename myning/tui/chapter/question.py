@@ -16,8 +16,9 @@ class Question(Static):
         table.add_row(f"[bold]{self.message}[/]" if isinstance(self.message, str) else self.message)
 
         if self.subtitle:
-            if isinstance(self.subtitle, str):
-                self.subtitle = Colors.LOCKED(self.subtitle)
-            table.add_row(self.subtitle)
+            subtitle = (
+                Colors.LOCKED(self.subtitle) if isinstance(self.subtitle, str) else self.subtitle
+            )
+            table.add_row(subtitle)
 
         return table

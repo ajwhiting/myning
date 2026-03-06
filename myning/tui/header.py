@@ -7,8 +7,8 @@ class HeaderClock(Static):
     def render(self):
         return datetime.now().strftime("%X")
 
-    def on_mount(self, _) -> None:
-        self.set_interval(0.01, self.refresh)
+    def on_mount(self) -> None:
+        self.set_interval(1, self.refresh)
 
 
 class Header(Static):
