@@ -78,6 +78,7 @@ def enter():
         message="Where would you like to go next?",
         options=options,
         border_title="Main Menu",
+        disable_escape=True,
     )
 
 
