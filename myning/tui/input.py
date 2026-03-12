@@ -11,8 +11,15 @@ class IntInput(Input):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, restrict=r"\d*", **kwargs)
 
+    def check_consume_key(self, key: str, character: str | None = None) -> bool:
+        """Only consume digit keys so non-digit bindings (like 'q') propagate."""
+        if character is not None and not character.isdigit():
+            return False
+        return super().check_consume_key(key, character)
+
 
 class IntInputScreen(ModalScreen[int | None]):
+    AUTO_FOCUS = "IntInput"
     BINDINGS = [
         ("escape", "cancel", "cancel"),
         Binding("q", "cancel", "cancel", priority=True),
@@ -48,8 +55,12 @@ class IntInputScreen(ModalScreen[int | None]):
             yield self.input
             yield Static(Formatter.locked("Press escape or q to cancel"))
 
+    def on_mount(self) -> None:
+        self.set_focus(self.input)
+
     def on_input_changed(self):
-        self.error.remove()
+        if self.error.is_attached:
+            self.error.remove()
 
     def on_input_submitted(self, event: Input.Submitted):
         if event.validation_result and event.validation_result.is_valid:

@@ -59,6 +59,39 @@ async def test_xp_input_rejects_non_digits(
     assert inp.value == "50"
 
 
+async def test_xp_input_has_focus(app: MyningApp, pilot: Pilot, chapter: ChapterWidget, ally):
+    """IntInput should have focus after IntInputScreen is pushed."""
+    player.exp_available = 100
+    chapter.pick(barracks.enter())
+    await pilot.pause(0.1)
+
+    await pilot.press("enter")
+    await pilot.pause(0.1)
+
+    assert isinstance(app.screen, IntInputScreen)
+    inp = app.screen.query_one(Input)
+    assert inp.has_focus, f"IntInput should have focus but focused widget is {app.focused}"
+
+
+async def test_xp_input_q_cancels(app: MyningApp, pilot: Pilot, chapter: ChapterWidget, ally):
+    """Pressing q in the XP input should dismiss the modal."""
+    player.exp_available = 100
+    original_exp = player.exp_available
+    chapter.pick(barracks.enter())
+    await pilot.pause(0.1)
+
+    await pilot.press("enter")
+    await pilot.pause(0.1)
+
+    assert isinstance(app.screen, IntInputScreen)
+
+    await pilot.press("q")
+    await pilot.pause(0.1)
+
+    assert not isinstance(app.screen, IntInputScreen), "q should dismiss IntInputScreen"
+    assert player.exp_available == original_exp
+
+
 async def test_xp_input_cancel(app: MyningApp, pilot: Pilot, chapter: ChapterWidget, ally):
     """Pressing escape or q in the XP input should dismiss without assigning XP."""
     player.exp_available = 100
