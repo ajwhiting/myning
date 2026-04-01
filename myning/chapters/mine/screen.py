@@ -26,6 +26,7 @@ from myning.objects.settings import Settings
 from myning.objects.trip import Trip
 from myning.tui.army import ArmyWidget
 from myning.tui.header import Header
+from myning.utilities.boss_scaling import get_effective_boss_config
 from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
 from myning.utilities.pick import throttle
@@ -280,7 +281,7 @@ class MineScreen(Screen[bool]):
                 should_trigger = elapsed >= self.boss_trigger_elapsed
             if should_trigger:
                 self.boss_triggered = True
-                return BossIntroAction(mine.boss)
+                return BossIntroAction(mine.boss, get_effective_boss_config(mine))
         odds = trip.mine.odds.copy()
         if not player.allies:
             odds = [o for o in odds if o["action"] != "lose_ally"]

@@ -7,6 +7,7 @@ from myning.chapters import Option, PickArgs
 from myning.config import MINES
 from myning.objects.mine import BossConfig, Mine
 from myning.objects.stats import Stats
+from myning.utilities.boss_scaling import get_effective_boss_config
 from myning.utilities.ui import Colors, Icons
 
 stats = Stats()
@@ -52,12 +53,14 @@ def show(boss: BossConfig, mine_name: str, back_handler: Callable):
 
     from myning.utilities.boss_art import render_boss_art  # noqa: PLC0415
 
-    art = render_boss_art(boss)
+    effective_boss = get_effective_boss_config(MINES[mine_name])
+    art = render_boss_art(effective_boss)
 
     stats_table = Table.grid(padding=(0, 1))
     stats_table.add_row("Mine:", mine_name)
-    stats_table.add_row("Level:", str(boss.level))
-    stats_table.add_row("Reward Multiplier:", f"x{boss.reward_multiplier}")
+    stats_table.add_row("Level:", str(effective_boss.level))
+    stats_table.add_row("Health Multiplier:", f"x{effective_boss.health_multiplier}")
+    stats_table.add_row("Reward Multiplier:", f"x{effective_boss.reward_multiplier}")
 
     content = Table.grid()
     content.add_row(f"[bold]{Icons.BOSS} {boss.name}[/]\n")

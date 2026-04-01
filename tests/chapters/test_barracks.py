@@ -112,3 +112,25 @@ async def test_xp_input_cancel(app: MyningApp, pilot: Pilot, chapter: ChapterWid
 
     assert not isinstance(app.screen, IntInputScreen)
     assert player.exp_available == original_exp
+
+
+async def test_barracks_resets_table_scroll_and_cursor(chapter: ChapterWidget, ally):
+    chapter.pick(barracks.enter())
+
+    chapter.option_table.move_cursor(column=len(chapter.option_table.columns) - 1)
+    chapter.option_table.scroll_to(x=100, animate=False, force=True, immediate=True)
+
+    chapter.pick(barracks.enter())
+
+    assert chapter.option_table.cursor_column == 0
+    assert chapter.option_table.cursor_row == 0
+    assert chapter.option_table.scroll_x == 0
+
+
+async def test_barracks_sizes_name_column_from_all_rows(chapter: ChapterWidget, ally):
+    ally.name = "Very Long Ally Name"
+    chapter.pick(barracks.enter())
+
+    name_column = list(chapter.option_table.columns.values())[1]
+
+    assert name_column.width >= len(ally.name)

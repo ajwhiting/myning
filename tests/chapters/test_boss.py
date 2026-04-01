@@ -6,13 +6,17 @@ import pytest
 from textual.screen import Screen
 
 from myning.chapters.mine import pick_time
+from myning.chapters.mine.actions import BossVictoryAction
 from myning.chapters.mine.screen import MineScreen
 from myning.config import MINES
 from myning.objects.mine_stats import MineStats
 from myning.objects.player import Player
+from myning.objects.stats import IntegerStatKeys, Stats
 from myning.objects.trip import Trip
+from myning.utilities.boss_scaling import get_effective_boss_config
 
 player = Player()
+stats = Stats()
 trip = Trip()
 
 BOSS_MINE = MINES["Hole in the ground"]
@@ -104,3 +108,16 @@ def test_pick_time_shows_regular_selection_when_boss_defeated():
 
     assert "How long" in result.message
     assert "safely" not in result.message
+
+
+def test_boss_victory_awards_gold_for_level_appropriate_boss():
+    player.level = BOSS_MINE.min_player_level
+    starting_gold = player.gold
+    starting_gold_earned = stats.integer_stats.get(IntegerStatKeys.GOLD_EARNED.value, 0)
+    effective_boss = get_effective_boss_config(BOSS_MINE, standard_boost=1)
+
+    BossVictoryAction(effective_boss)
+
+    assert trip.boss_gold_bonus > 0
+    assert player.gold == starting_gold + trip.boss_gold_bonus
+    assert stats.integer_stats[IntegerStatKeys.GOLD_EARNED.value] == starting_gold_earned + trip.boss_gold_bonus

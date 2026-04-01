@@ -1,6 +1,7 @@
 import string
 from typing import Protocol, runtime_checkable
 
+from rich.console import Console
 from rich.text import Text
 from textual import events
 from textual.containers import ScrollableContainer
@@ -29,6 +30,7 @@ from myning.utilities.tab_title import TabTitle
 
 player = Player()
 trip = Trip()
+measurement_console = Console(width=80)
 
 
 @runtime_checkable
@@ -60,6 +62,17 @@ def _find_key_handler(widget: "ChapterWidget") -> ChapterKeyHandler | None:
         if isinstance(child, ChapterKeyHandler):
             return child
     return None
+
+
+def _get_cell_width(cell) -> int:
+    if isinstance(cell, str):
+        return Text.from_markup(cell).cell_len
+    if isinstance(cell, Text):
+        return cell.cell_len
+    try:
+        return measurement_console.measure(cell, options=measurement_console.options).maximum
+    except Exception:  # pragma: no cover - defensive fallback for unknown renderables
+        return len(str(cell))
 
 
 class ChapterWidget(ScrollableContainer):
@@ -151,24 +164,27 @@ class ChapterWidget(ScrollableContainer):
         self.option_table.clear(columns=True)
         if options:
             column_count = max(len(option) for option in options)
+            column_widths = [0] * column_count
+            for col_idx in range(column_count):
+                if args.column_titles and col_idx < len(args.column_titles):
+                    column_widths[col_idx] = _get_cell_width(args.column_titles[col_idx])
+                for option in options:
+                    if col_idx < len(option):
+                        column_widths[col_idx] = max(column_widths[col_idx], _get_cell_width(option[col_idx]))
+
             if args.column_titles:
                 self.option_table.show_header = True
                 while len(args.column_titles) < column_count:
                     args.column_titles.append("")
-                self.option_table.add_columns(*args.column_titles)
+                for col_idx, title in enumerate(args.column_titles):
+                    self.option_table.add_column(title, width=max(column_widths[col_idx], 1))
             else:
                 self.option_table.show_header = False
                 for col_idx in range(column_count):
-                    max_width = 0
-                    for option in options:
-                        if col_idx < len(option):
-                            cell = option[col_idx]
-                            if isinstance(cell, str):
-                                max_width = max(max_width, Text.from_markup(cell).cell_len)
-                            elif isinstance(cell, Text):
-                                max_width = max(max_width, cell.cell_len)
-                    self.option_table.add_column(str(col_idx), width=max(max_width, 1))
+                    self.option_table.add_column(str(col_idx), width=max(column_widths[col_idx], 1))
             self.option_table.add_rows(options)
+            self.option_table.move_cursor(row=0, column=0, scroll=False)
+        self.option_table.scroll_home(animate=False, force=True, immediate=True)
         self.hotkeys = hotkeys
         self.handlers = [opt.handler for opt in args.options]
 

@@ -36,6 +36,7 @@ class Trip(Object, metaclass=Singleton):
         self.species_discovered = 0
         self.mine: Mine | None = None
         self.boss_defeated = False
+        self.boss_gold_bonus = 0
 
     def add_item(self, item: Item):
         if item.type == ItemType.MINERAL:
@@ -93,6 +94,7 @@ class Trip(Object, metaclass=Singleton):
             "experience_gained": self.experience_gained,
             "total_seconds": self.total_seconds,
             "boss_defeated": self.boss_defeated,
+            "boss_gold_bonus": self.boss_gold_bonus,
         }
 
     file_name = "trip"
@@ -123,6 +125,7 @@ class Trip(Object, metaclass=Singleton):
         summary.experience_gained = dict["experience_gained"]
         summary.total_seconds = dict.get("total_seconds") or 0
         summary.boss_defeated = dict.get("boss_defeated", False)
+        summary.boss_gold_bonus = dict.get("boss_gold_bonus", 0)
         return summary
 
     @property
@@ -134,6 +137,8 @@ class Trip(Object, metaclass=Singleton):
         table.add_row(Icons.VICTORY, "Battles won:", str(self.battles_won))
         table.add_row(Icons.SWORD, "Enemies defeated:", str(self.enemies_defeated))
         table.add_row(Icons.MINERAL, "Minerals mined:", str(len(self.minerals_mined)))
+        if self.boss_gold_bonus:
+            table.add_row(Icons.GOLD, "Boss bounty:", f"[bold]{self.boss_gold_bonus:,}g[/]")
         return table
 
     @property
@@ -169,4 +174,6 @@ class Trip(Object, metaclass=Singleton):
         )
         table.add_row("Battles Won", f"[bold]{self.battles_won}[/]")
         table.add_row("Enemies Defeated", f"[bold]{self.enemies_defeated}[/]")
+        if self.boss_gold_bonus:
+            table.add_row("Boss Bounty", f"[bold]{self.boss_gold_bonus:,}g[/]")
         return table

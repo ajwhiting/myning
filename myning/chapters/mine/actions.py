@@ -20,6 +20,7 @@ from myning.objects.settings import Settings
 from myning.objects.stats import IntegerStatKeys, Stats
 from myning.objects.trip import Trip
 from myning.utilities.boss_art import render_boss_art
+from myning.utilities.boss_scaling import get_boss_gold_bonus
 from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
 from myning.utilities.generators import (
@@ -377,9 +378,9 @@ class LoseAllyAction(Action):
 
 
 class BossIntroAction(Action):
-    def __init__(self, boss_config: BossConfig):
-        self.boss_config = boss_config
-        self._art = render_boss_art(boss_config)
+    def __init__(self, boss_config: BossConfig, scaled_boss_config: BossConfig | None = None):
+        self.boss_config = scaled_boss_config or boss_config
+        self._art = render_boss_art(self.boss_config)
         super().__init__(7)
 
     @property
@@ -455,19 +456,28 @@ class BossVictoryAction(Action):
         self.boss_config = boss_config
         trip.boss_defeated = True
         assert trip.mine
+        self.gold_bonus = get_boss_gold_bonus(trip.mine, boss_config, player.level)
+        trip.boss_gold_bonus = self.gold_bonus
+        if self.gold_bonus:
+            player.gold += self.gold_bonus
+            stats.increment_int_stat(IntegerStatKeys.GOLD_EARNED, self.gold_bonus)
         rewards = []
         for _ in range(boss_config.reward_multiplier):
             rewards.extend(generate_reward(trip.mine.max_item_level, 1))
         trip.add_items(*rewards)
-        FileManager.multi_save(trip, *rewards)
+        FileManager.multi_save(trip, player, stats, *rewards)
         self.rewards = rewards
-        super().__init__(len(rewards) + 1)
+        super().__init__(len(rewards) + 2 if self.gold_bonus else len(rewards) + 1)
 
     @property
     def content(self):
-        lines = [f"[bold green1]{Icons.BOSS} {self.boss_config.victory_text}[/]\n"] + [
-            item.battle_new_str for item in self.rewards[: len(self.rewards) - self.duration + 1]
-        ]
+        lines = [f"[bold green1]{Icons.BOSS} {self.boss_config.victory_text}[/]\n"]
+        reward_count = len(self.rewards) - self.duration + 1
+        if self.gold_bonus:
+            reward_count += 1
+            if self.duration <= len(self.rewards) + 1:
+                lines.append(f"{Icons.GOLD} [bold gold1]+{self.gold_bonus:,}g[/]")
+        lines.extend(item.battle_new_str for item in self.rewards[:reward_count])
         return "\n".join(lines)
 
     @property

@@ -78,6 +78,8 @@ def reset_objects():
     inventory.clear()
     trip.clear()
     settings.mini_games_disabled = False
+    stats.integer_stats = {}
+    stats.float_stats = {}
     stats.defeated_bosses = []
 
 

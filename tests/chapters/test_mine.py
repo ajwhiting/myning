@@ -1,8 +1,10 @@
 from unittest.mock import patch
 
+from rich.progress_bar import ProgressBar
 from textual.pilot import Pilot
 from textual.widgets import Static
 
+from myning.chapters import Option, PickArgs
 from myning.chapters.mine.screen import MineScreen
 from myning.config import MINES
 from myning.objects.player import Player
@@ -136,3 +138,18 @@ async def test_defeat(app: MyningApp, pilot: Pilot, chapter: ChapterWidget):
 
     # chasm is impossible for a level one player
     assert "You lost the battle" in chapter.question.message
+
+
+def test_pick_accepts_progress_bar_renderables(chapter: ChapterWidget):
+    chapter.pick(
+        PickArgs(
+            message="Which mine would you like to enter?",
+            options=[
+                Option(["🪨", "Trench", "💀 [green_yellow]low[/]", ProgressBar(total=570, completed=570, width=20)], lambda: PickArgs(message="", options=[])),
+                Option(["", "Go Back"], lambda: PickArgs(message="", options=[])),
+            ],
+        )
+    )
+
+    progress_column = list(chapter.option_table.columns.values())[3]
+    assert progress_column.width == 20
