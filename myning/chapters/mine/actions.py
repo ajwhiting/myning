@@ -417,6 +417,8 @@ class BossCombatAction(CombatAction):
             )
             boss_char.health = boss_char._max_health_override
             enemies = Army([boss_char])
+            trip.boss_fought = True
+            FileManager.save(trip)
         super().__init__(enemies=enemies, round=round)
 
     @property

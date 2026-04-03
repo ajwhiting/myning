@@ -36,6 +36,7 @@ class Trip(Object, metaclass=Singleton):
         self.species_discovered = 0
         self.mine: Mine | None = None
         self.boss_defeated = False
+        self.boss_fought = False
         self.boss_gold_bonus = 0
 
     def add_item(self, item: Item):
@@ -94,6 +95,7 @@ class Trip(Object, metaclass=Singleton):
             "experience_gained": self.experience_gained,
             "total_seconds": self.total_seconds,
             "boss_defeated": self.boss_defeated,
+            "boss_fought": self.boss_fought,
             "boss_gold_bonus": self.boss_gold_bonus,
         }
 
@@ -125,6 +127,7 @@ class Trip(Object, metaclass=Singleton):
         summary.experience_gained = dict["experience_gained"]
         summary.total_seconds = dict.get("total_seconds") or 0
         summary.boss_defeated = dict.get("boss_defeated", False)
+        summary.boss_fought = dict.get("boss_fought", False)
         summary.boss_gold_bonus = dict.get("boss_gold_bonus", 0)
         return summary
 

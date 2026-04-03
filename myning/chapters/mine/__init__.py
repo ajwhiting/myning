@@ -1,9 +1,11 @@
+import random
 from functools import partial
 from typing import TYPE_CHECKING
 
 from myning.chapters import DynamicArgs, Option, PickArgs, StoryArgs, healer, main_menu, tutorial
 from myning.chapters.mine.screen import MineScreen
 from myning.config import MINES, RESEARCH, SPECIES
+from myning.objects.graveyard import Graveyard
 from myning.objects.inventory import Inventory
 from myning.objects.macguffin import Macguffin
 from myning.objects.mine import Mine, MineType
@@ -16,6 +18,7 @@ from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
 from myning.utilities.pick import story_builder
 from myning.utilities.species_rarity import SPECIES_TIERS
+from myning.utilities.string_generation import generate_death_action
 from myning.utilities.tab_title import TabTitle
 from myning.utilities.ui import Colors, Icons
 
@@ -28,6 +31,45 @@ facility = ResearchFacility()
 stats = Stats()
 trip = Trip()
 inventory = Inventory()
+graveyard = Graveyard()
+
+BOSS_DEATH_CHANCE = 0.33
+
+
+def kill_allies_from_boss_loss() -> list[StoryArgs]:
+    story_args: list[StoryArgs] = []
+    if not player.allies:
+        return story_args
+
+    allies_to_kill = [
+        ally for ally in player.allies if not ally.is_ghost and random.random() < BOSS_DEATH_CHANCE
+    ]
+
+    for ally in allies_to_kill:
+        reason = generate_death_action()
+        for item in ally.equipment.all_items:
+            inventory.add_item(item)
+        ally.equipment.clear()
+
+        player.remove_ally(ally)
+        trip.remove_ally(ally)
+        graveyard.add_fallen_ally(ally)
+        stats.increment_int_stat(IntegerStatKeys.FALLEN_SOLDIERS)
+
+        story_args.append(
+            StoryArgs(
+                message=(
+                    f"[red1]Oh no! {ally.icon} {ally.name} has fallen![/]\n\n"
+                    f"Cause of death: {reason}."
+                ),
+                response="Rest in peace...",
+            )
+        )
+
+    if allies_to_kill:
+        FileManager.multi_save(trip, player, graveyard, inventory, stats)
+
+    return story_args
 
 
 def exit_mine():
@@ -205,15 +247,28 @@ def complete_trip(abandoned: bool):
     if player.army.defeated:
         stats.increment_int_stat(IntegerStatKeys.ARMY_DEFEATS)
         trip.subtract_losses()
-        story_args_list.append(
-            StoryArgs(
-                message="[red1]You lost the battle![/]\n\n"
-                f"You were defeated in {trip.mine.icon} [dodger_blue1]{trip.mine.name}[/]. "
-                f"You lost 1/{LOST_RATIO} of the items you found and xp you gained.",
-                response="Bummer!",
-                subtitle=f"You survived {int(trip.total_seconds / 60)} minute(s)",
+        if trip.boss_fought and trip.mine.boss:
+            story_args_list.append(
+                StoryArgs(
+                    message=f"[red1]You were defeated by {Icons.BOSS} "
+                    f"[bold]{trip.mine.boss.name}[/]![/]\n\n"
+                    f"You were defeated in {trip.mine.icon} [dodger_blue1]{trip.mine.name}[/]. "
+                    f"You lost 1/{LOST_RATIO} of the items you found and xp you gained.",
+                    response="Bummer!",
+                    subtitle=f"You survived {int(trip.total_seconds / 60)} minute(s)",
+                )
             )
-        )
+            story_args_list.extend(kill_allies_from_boss_loss())
+        else:
+            story_args_list.append(
+                StoryArgs(
+                    message="[red1]You lost the battle![/]\n\n"
+                    f"You were defeated in {trip.mine.icon} [dodger_blue1]{trip.mine.name}[/]. "
+                    f"You lost 1/{LOST_RATIO} of the items you found and xp you gained.",
+                    response="Bummer!",
+                    subtitle=f"You survived {int(trip.total_seconds / 60)} minute(s)",
+                )
+            )
     else:
         stats.increment_int_stat(IntegerStatKeys.TRIPS_FINISHED)
 
