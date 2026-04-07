@@ -285,6 +285,8 @@ class MineScreen(Screen[bool]):
         odds = trip.mine.odds.copy()
         if not player.allies:
             odds = [o for o in odds if o["action"] != "lose_ally"]
+        if not mine.companion_rarity:
+            odds = [o for o in odds if o["action"] != "recruit"]
         actions = [o["action"] for o in odds]
         chances = [o["chance"] for o in odds]
         selected_action = random.choices(actions, weights=chances)[0]

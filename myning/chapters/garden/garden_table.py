@@ -82,5 +82,5 @@ class GardenTable(OptionTable):  # pylint: disable=too-many-ancestors
         elif key == "down" and active.cursor_row == active.row_count - 1:
             active.show_cursor, inactive.show_cursor = inactive.show_cursor, active.show_cursor
             inactive.move_cursor(row=0)
-        elif binding := active._bindings.keys.get(key):  # pylint: disable=protected-access
-            await active.run_action(binding.action)
+        elif bindings := active._bindings.key_to_bindings.get(key):  # pylint: disable=protected-access
+            await active.run_action(bindings[0].action)
