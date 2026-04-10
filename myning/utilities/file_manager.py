@@ -80,6 +80,10 @@ class FileManager:
 
     @staticmethod
     def load(cls: Type[T], file_name=None, subfolder="") -> T | None:
+        # In Python 3.11+, str(SomeStrEnum.VALUE) returns "ClassName.MEMBER" not the value.
+        # Normalize enums to their plain string value before building paths.
+        if isinstance(subfolder, Enum):
+            subfolder = subfolder.value
         key = f"{subfolder}/{file_name}" if subfolder else file_name
 
         if _db_exists():

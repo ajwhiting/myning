@@ -99,12 +99,14 @@ class Garden(Object, metaclass=Singleton):
     def collect_water(self):
         if not self.last_collected_water:
             self.last_collected_water = datetime.now()
+            FileManager.save(self)
             return
         time_since_last_water = (datetime.now() - self.last_collected_water).total_seconds()
         new_water = min(self.level, self.water + int(time_since_last_water / 60))
         if new_water > self.water:
             self.last_collected_water = datetime.now()
             self.water = new_water
+            FileManager.save(self)
 
     def level_up(self):
         self.level += 1

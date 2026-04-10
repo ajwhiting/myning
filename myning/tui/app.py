@@ -54,8 +54,8 @@ class MyningScreen(Screen):
         key = aliases.get(event.name)
         # NOTE: _bindings is a private Textual API (tested against Textual 8.0.0).
         # If this breaks after a Textual upgrade, check BindingsMap for the new public API.
-        if key and (binding := focused._bindings.keys.get(key)):  # pylint: disable=protected-access
-            await focused.run_action(binding.action)
+        if key and (bindings := focused._bindings.key_to_bindings.get(key)):  # pylint: disable=protected-access
+            await focused.run_action(bindings[0].action)
 
     def action_toggle_sidebar(self):
         sidebar = self.query_one(SideBar)
