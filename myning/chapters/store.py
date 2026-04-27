@@ -1,3 +1,4 @@
+import random
 from functools import partial
 
 from rich.text import Text
@@ -5,6 +6,7 @@ from rich.text import Text
 from myning.chapters import Option, PickArgs, main_menu, tutorial
 from myning.chapters.base_store import BaseStore
 from myning.config import MARKDOWN_RATIO, UPGRADES
+from myning.objects.blacksmith_item import TIERS
 from myning.objects.inventory import Inventory
 from myning.objects.item import Item, ItemType
 from myning.objects.macguffin import Macguffin
@@ -13,7 +15,7 @@ from myning.objects.player import Player
 from myning.objects.stats import IntegerStatKeys, Stats
 from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
-from myning.utilities.generators import generate_equipment
+from myning.utilities.generators import generate_equipment, generate_rare_equipment
 from myning.utilities.pick import confirm
 
 player = Player()
@@ -34,6 +36,15 @@ class Store(BaseStore):
     def generate(self):
         amount = max(self.level, 5)
         self.add_items(*(generate_equipment(self.level) for _ in range(amount)))
+        self._generate_rare_items()
+
+    def _generate_rare_items(self):
+        if player.blacksmith_level < 2 or player.blacksmith_level >= len(TIERS):
+            return
+        next_tier = TIERS[player.blacksmith_level]
+        for _ in range(2):
+            if random.random() < 0.15:
+                self.add_item(generate_rare_equipment(next_tier))
 
     def enter(self):
         return PickArgs(

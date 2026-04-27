@@ -3,7 +3,7 @@ import random
 from myning.chapters import Option, PickArgs
 from myning.chapters.base_store import BaseStore
 from myning.config import STRINGS, UPGRADES
-from myning.objects.blacksmith_item import BlacksmithItem
+from myning.objects.blacksmith_item import TIERS
 from myning.objects.buying_option import BuyingOption
 from myning.objects.equipment import EQUIPMENT_TYPES
 from myning.objects.item import Item, ItemType
@@ -13,18 +13,6 @@ from myning.utilities.file_manager import FileManager
 from myning.utilities.formatter import Formatter
 
 player = Player()
-
-TIERS = [
-    BlacksmithItem("Soldier", 15, 50),
-    BlacksmithItem("Commander", 20, 250),
-    BlacksmithItem("General", 30, 500),
-    BlacksmithItem("Samurai", 40, 1_000),
-    BlacksmithItem("Ninja", 50, 2_000),
-    BlacksmithItem("Jedi", 75, 5_000),
-    BlacksmithItem("Blademaster", 100, 10_000),
-    BlacksmithItem("Spartan", 150, 40_000),
-    BlacksmithItem("Hero", 250, 200_000),
-]
 
 
 def enter():

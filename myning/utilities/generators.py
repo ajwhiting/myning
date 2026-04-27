@@ -3,6 +3,7 @@ import random
 
 from myning.config import SPECIES, STRINGS
 from myning.objects.army import Army
+from myning.objects.blacksmith_item import BlacksmithItem
 from myning.objects.character import Character, CharacterSpecies
 from myning.objects.equipment import EQUIPMENT_TYPES
 from myning.objects.item import Item, ItemType
@@ -67,6 +68,15 @@ def generate_equipment(level, type: ItemType | None = None, scale=1):
     # Add other random affects
 
     return equipment
+
+
+def generate_rare_equipment(tier: BlacksmithItem, price_multiplier: int = 3):
+    item_type = get_random_array_item(EQUIPMENT_TYPES)
+    type_name = get_random_array_item(STRINGS[item_type.value])
+    name = f"Rare {tier.name}'s {type_name}"
+    base_value = tier.value if item_type == ItemType.WEAPON else int(tier.value * 0.4)
+    price = base_value * price_multiplier
+    return Item(name, "", item_type, value=price, main_affect=tier.main_affect)
 
 
 def generate_mineral(max, mineral=None):
